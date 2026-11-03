@@ -6,7 +6,8 @@ const registryRoute: CanMatchFn = (_route, segments) => ['applications', 'depend
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'overview' },
   { path: '', canMatch: [registryRoute], loadChildren: () => import('./features/registry/registry.routes').then(m => m.REGISTRY_ROUTES) },
-  ...workspaceSections.filter(section => !['applications', 'dependencies', 'contracts'].includes(section.path)).map((section) => ({
+  { path: 'verifications', loadChildren: () => import('./features/verifications/verification.routes').then(m => m.VERIFICATION_ROUTES) },
+  ...workspaceSections.filter(section => !['applications', 'dependencies', 'contracts', 'verifications'].includes(section.path)).map((section) => ({
     path: section.path,
     title: `${section.label} | Pact`,
     data: { section },

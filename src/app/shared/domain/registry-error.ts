@@ -13,3 +13,17 @@ export class RegistryError extends Error {
     this.name = 'RegistryError';
   }
 }
+
+/** Plain serializable failure state, shared by read features. */
+export interface RegistryFailure {
+  readonly kind: RegistryErrorKind;
+  readonly message: string;
+  readonly traceId: string | null;
+  readonly validation: Readonly<Record<string, readonly string[]>>;
+}
+
+export function registryFailure(error: unknown): RegistryFailure {
+  return error instanceof RegistryError
+    ? { kind: error.kind, message: error.message, traceId: error.traceId, validation: error.validation }
+    : { kind: 'service', message: 'The registry request could not be completed.', traceId: null, validation: {} };
+}

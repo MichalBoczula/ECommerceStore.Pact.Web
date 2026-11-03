@@ -85,6 +85,7 @@
       <section class="panel"><span class="kind-label">Declared</span><h2>Consumer → provider</h2><app-record-fields [fields]="integrationFields(data.integration)" />
         <div class="actions"><a mat-stroked-button [routerLink]="['/applications', data.integration.consumerApplicationId]">Consumer versions</a><a mat-stroked-button [routerLink]="['/applications', data.integration.providerApplicationId]">Provider versions</a></div>
       </section>
+      <div class="actions section-actions"><a mat-stroked-button routerLink="/verifications" [queryParams]="integrationEvidence(data.integration, context())">Verification history</a></div>
       <section class="panel"><h2>Contract publications</h2><p>Choose consumer requirements or the provider schema. These publications are separate from verification outcomes.</p>
         <div class="actions"><a mat-flat-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'consumer')">Consumer publications</a><a mat-stroked-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'provider')">Provider publications</a></div>
       </section>
@@ -102,6 +103,7 @@
     @case ('publication') {
       <section class="panel"><span class="kind-label">{{ data.publication.kind }}</span><h2>Publication provenance</h2><app-record-fields [fields]="publicationFields(data.publication)" /></section>
       <section class="panel"><h2>Source version</h2><app-record-fields [fields]="versionFields(data.version)" /><a mat-button [routerLink]="['/applications', data.version.applicationId, 'versions', data.version.commitSha]">Open source version</a></section>
+      @if (publicationEvidence(data.publication); as scope) { <div class="actions section-actions"><a mat-stroked-button routerLink="/verifications" [queryParams]="scope">Verification history for this publication</a></div> }
       <section class="panel"><h2>Original artifact</h2><app-record-fields [fields]="artifactFields(data.artifact)" />
         <p>Downloads preserve the original bytes. Publication alone does not establish passing verification or compatibility.</p>
         <button mat-flat-button type="button" [disabled]="vm.download === 'loading'" (click)="facade.download()">{{ vm.download === 'loading' ? 'Downloading…' : 'Download original artifact' }}</button>

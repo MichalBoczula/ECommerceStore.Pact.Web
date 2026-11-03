@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { ExplorerFailure } from '../application/explorer.models';
+import { RegistryFailure } from '../domain/registry-error';
 
 @Component({
   selector: 'app-registry-error-panel', imports: [MatButtonModule],
@@ -14,7 +14,7 @@ import { ExplorerFailure } from '../application/explorer.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistryErrorPanel {
-  readonly error = input.required<ExplorerFailure>();
+  readonly error = input.required<RegistryFailure>();
   readonly retry = output<void>();
   readonly validation = computed(() => Object.entries(this.error().validation));
   readonly title = computed(() => ({ validation: 'Check the filters', 'not-found': 'Record not found', unavailable: 'Registry unavailable',

@@ -2,13 +2,7 @@ import { defer, forkJoin, map, Observable, switchMap } from 'rxjs';
 import { RegistryError } from '../../../shared/domain/registry-error';
 import { PageRequest } from '../domain/registry.models';
 import { RegistryRepository } from '../domain/registry.repository';
-import { ExplorerData, ExplorerFailure, ExplorerSelection } from './explorer.models';
-
-export function failure(error: unknown): ExplorerFailure {
-  return error instanceof RegistryError
-    ? { kind: error.kind, message: error.message, traceId: error.traceId, validation: error.validation }
-    : { kind: 'service', message: 'The registry request could not be completed.', traceId: null, validation: {} };
-}
+import { ExplorerData, ExplorerSelection } from './explorer.models';
 
 export function loadExplorer(repository: RegistryRepository, selection: ExplorerSelection): Observable<ExplorerData> {
   return defer(() => {

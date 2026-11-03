@@ -2,8 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, defer, exhaustMap, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { RegistryRepository } from '../domain/registry.repository';
-import { ArtifactDownloads } from '../application/explorer.models';
-import { failure, loadExplorer } from '../application/load-explorer';
+import { ArtifactDownloads } from '../../../shared/domain/artifact-downloads';
+import { registryFailure as failure } from '../../../shared/domain/registry-error';
+import { loadExplorer } from '../application/load-explorer';
 import { ExplorerActions as Events } from './explorer.actions';
 
 @Injectable()

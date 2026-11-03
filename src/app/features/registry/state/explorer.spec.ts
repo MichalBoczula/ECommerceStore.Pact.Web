@@ -1,15 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { Actions } from '@ngrx/effects';
 import { firstValueFrom, Observable, of, Subject, throwError } from 'rxjs';
+import { ArtifactDownloads } from '../../../shared/domain/artifact-downloads';
 import { RegistryError } from '../../../shared/domain/registry-error';
-import { ArtifactDownloads, ExplorerData, ExplorerSelection } from '../application/explorer.models';
+import { ExplorerData, ExplorerSelection } from '../application/explorer.models';
 import { loadExplorer } from '../application/load-explorer';
 import { RegistryRepository } from '../domain/registry.repository';
 import { ApplicationVersion, ContractArtifact, PublicationDetail } from '../domain/registry.models';
 import { ExplorerEffects } from './explorer.effects';
 import { ExplorerActions as Events } from './explorer.actions';
 import { explorerFeature } from './explorer.feature';
-import { commitUrl, webUrl } from '../presentation/record-fields';
+import { commitUrl, webUrl } from '../../../shared/presentation/record-fields';
 
 class TestRegistry extends RegistryRepository {
   override applications = vi.fn<RegistryRepository['applications']>();
