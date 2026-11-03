@@ -19,18 +19,24 @@ below 768px the header opens an overlay drawer and selecting a destination close
 links expose the current page. Local fonts, visible keyboard focus, a skip link and one main region
 are part of the shell. Semantic colors follow the approved Figma concepts and existing store palette.
 
-## Planned API boundary (WEB/02-03)
+## API boundary (WEB/03)
 
 Browser → same-origin `/backend/api/...` → Angular development proxy or Nginx → Pact `/api/...`.
-Nginx removes only `/backend`, preserving `/api`. One Pact API does not require a new business BFF.
-Reviewed upstream OpenAPI and a pinned Kiota generator will produce one committed client.
+The development proxy removes only `/backend`, preserving `/api`; production Nginx follows in
+WEB/10. One Pact API does not require a new business BFF. Reviewed upstream OpenAPI and pinned
+Kiota 1.34.1 produce one committed GET-only client, loaded on the first repository read.
 Handwritten infrastructure repositories and mappers keep transport DTOs outside presentation and
-domain models. Domain-facing ports do not reference generated clients. Errors map from ProblemDetails.
+domain models. Domain-facing ports do not reference generated clients. Registry and verification
+reads have concrete ports and providers; history, matrix and dashboard ports arrive with those
+features. Errors map from ProblemDetails into presentation-safe domain errors. See
+[the contract and transport details](api-boundary.md).
 
 Presentation → facade → NgRx actions/effects/selectors → repository port → Kiota adapter → API.
 Use cancellation/latest-request behavior and URL filters where the use case requires it. The API owns
 pagination, discovery projections and evidence policies; the browser does not fetch every record to
-reconstruct the database. API/DTO/library changes land with their contracts and meaningful tests.
+reconstruct the database. Each read subscription owns an adapter and AbortController. Unsubscribe
+aborts the fetch and prevents stale emissions. No automatic retries or redirects cross this boundary.
+API/DTO/library changes land with their contracts and meaningful tests.
 
 ## Evidence rules
 
@@ -54,5 +60,8 @@ registry/container acceptance belongs to WEB/09 and source-CI/hosted acceptance 
 
 CI on `main`/PRs runs source checks, audit, lint/build, coverage, browser smoke, dependency review and
 gitleaks. `quality-gate` fails when a mandatory dependency fails, is cancelled or unexpectedly skipped.
-WEB/10 will add build-once scanned-image publication. WEB/11 reuses the existing Terraform root/state
-and ACA environment. No image publishing, Terraform apply or cloud readiness is part of WEB/01.
+The build job also verifies the snapshot hash, infrastructure import boundary and deterministic
+regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated
+serialization is exercised by repository tests. WEB/10 will add build-once scanned-image publication.
+WEB/11 reuses the existing Terraform root/state and ACA environment. No image publishing, Terraform
+apply or cloud readiness is part of WEB/01-03.

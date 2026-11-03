@@ -5,9 +5,9 @@ The backend's PACT/09 source-CI pilot and the final hosted acceptance remain exp
 
 | Task | Package | Status | Depends on |
 | --- | --- | --- | --- |
-| WEB/01 | Angular foundation | Implemented; PR CI pending | - |
-| WEB/02 | Dashboard read API (Pact API repository) | Planned | Backend evidence model |
-| WEB/03 | Pinned Kiota client, repositories, mappers and errors | Planned | 01, 02 |
+| WEB/01 | Angular foundation | Merged ([#1](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/1)); CI passed | - |
+| WEB/02 | Dashboard read API (Pact API repository) | Merged ([API #9](https://github.com/MichalBoczula/ECommerceStore.Pact/pull/9)); CI passed | Backend evidence model |
+| WEB/03 | Pinned Kiota client, repositories, mappers and errors | Implemented; PR verification in progress | 01, 02 |
 | WEB/04 | Application, version, integration and contract explorer | Planned | 03 |
 | WEB/05 | Verification history and diagnostic details | Planned | 03, 04 |
 | WEB/06 | Contract comparisons and comparable issue history | Planned | 05 |
