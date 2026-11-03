@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@11.5.2
+      - run: npm ci
+      - run: bash scripts/ci.sh source
+      - run: bash scripts/ci.sh audit
+      - run: bash scripts/ci.sh build
+
+  unit-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@11.5.2
+      - run: npm ci
+      - run: bash scripts/ci.sh unit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-reports
+          path: |
+            TestResults/unit.xml
+            coverage/
+          if-no-files-found: error
+
+  browser-smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --global npm@11.5.2
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: bash scripts/ci.sh smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-smoke-reports
+          path: |
+            TestResults/smoke.xml
+            TestResults/playwright-html/
+            TestResults/playwright-results/
+          if-no-files-found: error
+
+  quality-gate:
+    if: always()
+    needs: [build, unit-tests, browser-smoke, dependency-review, secret-scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every mandatory check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BUILD: ${{ needs.build.result }}
+          UNIT: ${{ needs.unit-tests.result }}
+          BROWSER: ${{ needs.browser-smoke.result }}
+          DEPENDENCY: ${{ needs.dependency-review.result }}
+          SECRETS: ${{ needs.secret-scan.result }}
+        run: |
+          set -euo pipefail
+          for job in BUILD UNIT BROWSER SECRETS; do
+            if [[ "${!job}" != success ]]; then
+              echo "$job must succeed; actual result: ${!job}" >&2
+              exit 1
+            fi
+          done
+          expected=success
+          if [[ "$EVENT_NAME" == push ]]; then expected=skipped; fi
+          if [[ "$DEPENDENCY" != "$expected" ]]; then
+            echo "Dependency Review must be $expected; actual result: $DEPENDENCY" >&2
+            exit 1
+          fi

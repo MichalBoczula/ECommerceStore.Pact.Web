@@ -1,0 +1,38 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+<mat-sidenav-container class="workspace">
+  <mat-sidenav #drawer id="workspace-navigation" class="workspace-sidebar" role="complementary" aria-label="Contract workspace"
+    [mode]="isMobile() ? 'over' : 'side'" [opened]="!isMobile()" (openedChange)="drawerOpen.set($event)">
+    <div class="sidebar-content">
+      <a class="brand" routerLink="/overview" (click)="closeOnMobile(drawer)">
+        <span class="brand-name">PACT</span>
+        <span class="brand-description">Contract intelligence</span>
+      </a>
+      <mat-nav-list aria-label="Main navigation">
+        @for (section of sections; track section.path) {
+          <a mat-list-item [routerLink]="['/', section.path]" routerLinkActive="navigation-active"
+            [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page"
+            (click)="closeOnMobile(drawer)">
+            <span matListItemTitle>{{ section.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+      <div class="sidebar-footer">
+        <p class="read-only-label">Read-only registry</p>
+        <p>Evidence-based compatibility</p>
+      </div>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <header class="mobile-toolbar">
+      <a class="mobile-brand" routerLink="/overview" aria-label="Pact overview">PACT</a>
+      <button mat-stroked-button type="button" aria-controls="workspace-navigation"
+        [attr.aria-expanded]="drawerOpen()" aria-label="Open navigation menu" (click)="drawer.toggle()">
+        <mat-icon aria-hidden="true">menu</mat-icon>
+        Menu
+      </button>
+    </header>
+    <main id="main-content" tabindex="-1" class="workspace-main">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
