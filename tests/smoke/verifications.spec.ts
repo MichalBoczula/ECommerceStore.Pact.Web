@@ -118,6 +118,17 @@ test('publication links scope consumer evidence by Pact hash and provider eviden
   const q = new URL(page.url()).searchParams; expect(q.get('providerCommitSha')).toBe(providerCommit); expect(q.has('contractSha256')).toBe(false); expect(page.url()).not.toContain(providerHash);
 });
 
+test('declaration history retains the selected source commit in its correct role', async ({ page }) => {
+  await verificationFixture(page);
+  for (const [application, commit, field, other] of [['payments', consumerCommit, 'consumerCommitSha', 'providerCommitSha'], ['invoice', providerCommit, 'providerCommitSha', 'consumerCommitSha']]) {
+    await page.goto(`/dependencies/payments/invoice?sourceApplicationId=${application}&commitSha=${commit}`);
+    await page.getByRole('link', { name: 'Verification history', exact: true }).click();
+    await expect(page.locator('app-evidence-status')).toHaveCount(4);
+    expect(new URL(page.url()).searchParams.get(field)).toBe(commit);
+    expect(new URL(page.url()).searchParams.has(other)).toBe(false);
+  }
+});
+
 test('mobile and desktop diagnostics wrap exact identities and remain accessible', async ({ page }) => {
   await verificationFixture(page);
   await page.route(`**/backend/api/verification-runs/${failedRunId}`, route => route.fulfill({ contentType: 'application/json', body: reportBody({ ...failedRun, issues: [failedRun.issues[0]] }) }));

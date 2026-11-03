@@ -7,7 +7,7 @@ import { RegistryError } from '../../../shared/domain/registry-error';
 import { RegistryRepository } from '../../registry/domain/registry.repository';
 import { ApplicationVersion, PublicationDetail } from '../../registry/domain/registry.models';
 import { evidenceFilter, loadRunSources, loadVerifications } from '../application/load-verifications';
-import { publicationEvidence } from '../application/evidence-links';
+import { integrationEvidence, publicationEvidence } from '../application/evidence-links';
 import { VerificationData, VerificationSelection } from '../application/verification-view.models';
 import { VerificationRepository } from '../domain/verification.repository';
 import { VerificationRun } from '../domain/verification.models';
@@ -63,6 +63,12 @@ describe('explicit verification selection', () => {
     expect(publicationEvidence(publication)).toEqual({ consumerApplicationId: 'payments', consumerCommitSha: consumerCommit, providerApplicationId: 'invoice', contractSha256: hash });
     expect(publicationEvidence({ ...publication, kind: 'ProviderOpenApi', consumerApplicationId: null, sourceApplicationId: 'invoice', commitSha: providerCommit })).toEqual({ providerApplicationId: 'invoice', providerCommitSha: providerCommit });
     expect(publicationEvidence({ ...publication, kind: 'FutureKind' })).toBeNull();
+  });
+  it('retains the selected source commit in its consumer/provider role when opening declaration history', () => {
+    const integration = { id: 'id', consumerApplicationId: 'payments', providerApplicationId: 'invoice', registeredAt: timestamp };
+    expect(integrationEvidence(integration, { sourceApplicationId: 'payments', commitSha: consumerCommit })).toEqual({ consumerApplicationId: 'payments', providerApplicationId: 'invoice', consumerCommitSha: consumerCommit });
+    expect(integrationEvidence(integration, { sourceApplicationId: 'invoice', commitSha: providerCommit })).toEqual({ consumerApplicationId: 'payments', providerApplicationId: 'invoice', providerCommitSha: providerCommit });
+    expect(integrationEvidence(integration, {})).toEqual({ consumerApplicationId: 'payments', providerApplicationId: 'invoice' });
   });
 });
 

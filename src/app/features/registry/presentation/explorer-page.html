@@ -85,7 +85,7 @@
       <section class="panel"><span class="kind-label">Declared</span><h2>Consumer → provider</h2><app-record-fields [fields]="integrationFields(data.integration)" />
         <div class="actions"><a mat-stroked-button [routerLink]="['/applications', data.integration.consumerApplicationId]">Consumer versions</a><a mat-stroked-button [routerLink]="['/applications', data.integration.providerApplicationId]">Provider versions</a></div>
       </section>
-      <div class="actions section-actions"><a mat-stroked-button routerLink="/verifications" [queryParams]="{ consumerApplicationId: data.integration.consumerApplicationId, providerApplicationId: data.integration.providerApplicationId }">Verification history</a></div>
+      <div class="actions section-actions"><a mat-stroked-button routerLink="/verifications" [queryParams]="integrationEvidence(data.integration, context())">Verification history</a></div>
       <section class="panel"><h2>Contract publications</h2><p>Choose consumer requirements or the provider schema. These publications are separate from verification outcomes.</p>
         <div class="actions"><a mat-flat-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'consumer')">Consumer publications</a><a mat-stroked-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'provider')">Provider publications</a></div>
       </section>

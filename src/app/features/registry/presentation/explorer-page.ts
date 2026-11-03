@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
-import { publicationEvidence } from '../../verifications/application/evidence-links';
+import { integrationEvidence, publicationEvidence } from '../../verifications/application/evidence-links';
 import { ExplorerFacade } from '../application/explorer.facade';
 import { ExplorerKind, ExplorerSelection } from '../application/explorer.models';
 import { ApplicationVersion, ContractArtifact, Integration, PublicationDetail } from '../domain/registry.models';
@@ -32,6 +32,7 @@ const titles: Record<ExplorerKind, string> = { applications: 'Applications', ver
 export class ExplorerPage {
   readonly facade = inject(ExplorerFacade);
   readonly publicationEvidence = publicationEvidence;
+  readonly integrationEvidence = integrationEvidence;
   readonly view = this.facade.view;
   readonly selection = signal<ExplorerSelection>({ kind: 'applications', params: {}, query: {} });
   readonly fields = computed(() => filters[this.selection().kind]);

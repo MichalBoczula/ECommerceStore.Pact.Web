@@ -58,7 +58,8 @@ The consumer publication button targets the report's exact publication ID. Downl
 uses the report's pinned consumer hash, saves unchanged bytes through the shared browser adapter,
 and reports a failed download without claiming success. It never reserializes a JSON artifact.
 
-The explorer links declarations to consumer/provider history. A consumer Pact publication scopes
+The explorer links declarations to consumer/provider history and retains a selected source commit
+in its matching role without pinning the other application's version. A consumer Pact publication scopes
 history by its consumer commit, provider and Pact hash. A provider OpenAPI publication scopes it by
 provider commit; its schema hash is not a consumer Pact verification hash. No latest version or
 compatibility selection is inferred from a publication.
