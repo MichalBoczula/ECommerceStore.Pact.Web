@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/MichalBoczula/ECommerceStore.Pact",
+  "sourceCommit": "e061fa37c6c3fb49a6422b10caac517432e3bff9",
+  "sourceTree": "cc16344d11493241f857d2877df9e70a05c6a6de",
+  "exportMethod": "GET /openapi/v1.json from the Release API built from the reviewed source tree; Production, no publisher credentials; not a deployment/image attestation",
+  "specPath": "contracts/upstream/pact.openapi.json",
+  "specSha256": "e442f44cb01665bd54037ad55e77875d437a11faf47d3607aa6c8150e729403c",
+  "generator": {
+    "name": "Microsoft Kiota",
+    "version": "1.34.1",
+    "platform": "linux-x64",
+    "archiveSha256": "682416ab85c07bb3152e4c2c54293ae51f582aebde381699d8999f7b076755dd",
+    "includePath": "/api/**#GET"
+  }
+}

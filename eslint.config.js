@@ -5,7 +5,7 @@ const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 
 module.exports = defineConfig([
-  { ignores: ['dist/**', 'coverage/**', 'TestResults/**'] },
+  { ignores: ['dist/**', 'coverage/**', 'TestResults/**', 'src/app/shared/infrastructure/api-clients/**'] },
   {
     files: ['**/*.ts'],
     extends: [eslint.configs.recommended, tseslint.configs.recommended, tseslint.configs.stylistic, angular.configs.tsRecommended],

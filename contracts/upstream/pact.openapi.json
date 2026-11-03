@@ -1,0 +1,5035 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "ECommerceStore Pact Registry",
+    "description": "Immutable contract artifacts, source versions, publication provenance and provider CI reports. Upload acceptance is not verification evidence.",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://pact-contract-source.invalid/"
+    }
+  ],
+  "paths": {
+    "/api/applications/{applicationId}/versions": {
+      "post": {
+        "tags": [
+          "Application versions"
+        ],
+        "summary": "Register an immutable application version, or return the existing equivalent registration.",
+        "operationId": "RegisterApplicationVersion",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterApplicationVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationVersionResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationVersionResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse exact registered versions; newest registration then ID. No version is selected as compatible.",
+        "operationId": "ListApplicationVersions",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfApplicationVersionResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{applicationId}/versions/{commitSha}": {
+      "get": {
+        "tags": [
+          "Application versions"
+        ],
+        "summary": "Read a version by its application ID and full commit SHA.",
+        "operationId": "GetApplicationVersion",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "commitSha",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationVersionResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations": {
+      "post": {
+        "tags": [
+          "Integrations"
+        ],
+        "summary": "Declare a directed consumer-to-provider integration; duplicate registration is idempotent.",
+        "operationId": "RegisterIntegration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterIntegrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse directed declarations, including relationships without verification evidence.",
+        "operationId": "ListIntegrations",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfIntegrationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/{consumerApplicationId}/{providerApplicationId}": {
+      "get": {
+        "tags": [
+          "Integrations"
+        ],
+        "summary": "Read a declared integration. Registration is not verification evidence.",
+        "operationId": "GetIntegration",
+        "parameters": [
+          {
+            "name": "consumerApplicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contract-publications": {
+      "post": {
+        "tags": [
+          "Contract publications"
+        ],
+        "summary": "Publish original UTF-8 JSON bytes as base64 with source version and build provenance.",
+        "operationId": "PublishContract",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishContractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractPublicationResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractPublicationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse publication metadata without loading artifact bytes.",
+        "operationId": "ListContractPublications",
+        "parameters": [
+          {
+            "name": "sourceApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "commitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceRef",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfPublicationSummaryResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contract-publications/{id}": {
+      "get": {
+        "tags": [
+          "Contract publications"
+        ],
+        "operationId": "GetContractPublication",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractPublicationResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/artifacts/{sha256}": {
+      "get": {
+        "tags": [
+          "Contract publications"
+        ],
+        "operationId": "GetContractArtifact",
+        "parameters": [
+          {
+            "name": "sha256",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractArtifactResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/artifacts/{sha256}/content": {
+      "get": {
+        "tags": [
+          "Contract publications"
+        ],
+        "summary": "Download the original bytes without JSON reserialization.",
+        "operationId": "DownloadContractContent",
+        "parameters": [
+          {
+            "name": "sha256",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verification-runs": {
+      "post": {
+        "tags": [
+          "Verification runs"
+        ],
+        "summary": "Append a provider CI report; does not execute Pact verification.",
+        "operationId": "AppendVerificationRun",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerificationRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRunResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRunResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Verification runs"
+        ],
+        "summary": "Read a bounded history for an explicit integration and Pact hash; ID order is not a compatibility decision.",
+        "operationId": "ListVerificationRuns",
+        "parameters": [
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationPageResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verification-runs/{id}": {
+      "get": {
+        "tags": [
+          "Verification runs"
+        ],
+        "operationId": "GetVerificationRun",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRunResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contract-comparisons": {
+      "post": {
+        "tags": [
+          "Contract changes and issue history"
+        ],
+        "summary": "Snapshot a schema/content comparison between explicit publications and a selected branch baseline.",
+        "operationId": "CompareContracts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareContractsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractComparisonResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractComparisonResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse stored schema/content comparisons without recomputing them.",
+        "operationId": "ListContractComparisons",
+        "parameters": [
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "baselineRef",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfComparisonSummaryResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contract-comparisons/{id}": {
+      "get": {
+        "tags": [
+          "Contract changes and issue history"
+        ],
+        "operationId": "GetContractComparison",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractComparisonResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/issue-history": {
+      "get": {
+        "tags": [
+          "Contract changes and issue history"
+        ],
+        "summary": "Project issue transitions between explicit verification runs; changed requirements never prove a provider fix.",
+        "operationId": "CompareIssueHistory",
+        "parameters": [
+          {
+            "name": "beforeRunId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "afterRunId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "baselineRef",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueHistoryResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verification-profiles": {
+      "post": {
+        "tags": [
+          "Explicit-version compatibility"
+        ],
+        "summary": "Register consumer-owned immutable required checks; a changed check set needs a new profile version.",
+        "operationId": "RegisterVerificationProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterVerificationProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationProfileResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationProfileResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse immutable required-check profiles; selection remains explicit.",
+        "operationId": "ListVerificationProfiles",
+        "parameters": [
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfVerificationProfileResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verification-profiles/{id}": {
+      "get": {
+        "tags": [
+          "Explicit-version compatibility"
+        ],
+        "operationId": "GetVerificationProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationProfileResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/compatibility-decisions": {
+      "post": {
+        "tags": [
+          "Explicit-version compatibility"
+        ],
+        "summary": "Snapshot a bounded exact-version matrix for a pinned profile and explicit CI execution per pair.",
+        "operationId": "EvaluateCompatibility",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluateCompatibilityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompatibilityDecisionResultDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompatibilityDecisionResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "RegistryPublisher": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse stored decisions; version/hash filters must match the same matrix row.",
+        "operationId": "ListCompatibilityDecisions",
+        "parameters": [
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "profileId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfDecisionSummaryResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/compatibility-decisions/{id}": {
+      "get": {
+        "tags": [
+          "Explicit-version compatibility"
+        ],
+        "operationId": "GetCompatibilityDecision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompatibilityDecisionResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse registered applications by normalized ID prefix.",
+        "operationId": "ListApplications",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfRegisteredApplicationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/verification-runs": {
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse recorded executions and issue matches without selecting compatibility evidence.",
+        "operationId": "BrowseVerificationRuns",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceRef",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issueCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jsonPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciRunId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciAttempt",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ciCheckId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierVersion",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configurationSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryPageResultDtoOfVerificationSummaryResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/dependencies": {
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Browse a page of declared edges and matching report counts; not runtime traces or compatibility outcomes.",
+        "operationId": "GetDependencyGraph",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceRef",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issueCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jsonPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciRunId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciAttempt",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ciCheckId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierVersion",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configurationSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DependencyGraphResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reports/overview": {
+      "get": {
+        "tags": [
+          "Registry browsing and reports"
+        ],
+        "summary": "Global inventory and separately filtered recorded-report counts; not a transactional snapshot.",
+        "operationId": "GetRegistryOverview",
+        "parameters": [
+          {
+            "name": "consumerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerCommitSha",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contractSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceRef",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issueCode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jsonPath",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciRunId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciAttempt",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ciCheckId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verifierVersion",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "configurationSha256",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "consumerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerApplicationId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryOverviewResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplicationVersionResultDto": {
+        "required": [
+          "id",
+          "applicationId",
+          "commitSha",
+          "repositoryUrl",
+          "imageDigest",
+          "registeredAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "applicationId": {
+            "type": "string"
+          },
+          "commitSha": {
+            "type": "string"
+          },
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "imageDigest": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "registeredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CompareContractsRequest": {
+        "required": [
+          "sourceApplicationId",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "beforePublicationId",
+          "afterPublicationId",
+          "baselineRef"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "beforePublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "afterPublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "baselineRef": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ComparisonSourceResultDto": {
+        "required": [
+          "publicationId",
+          "bindingId",
+          "sourceVersionId",
+          "applicationId",
+          "commitSha",
+          "kind",
+          "artifactSha256",
+          "sourceRef"
+        ],
+        "type": "object",
+        "properties": {
+          "publicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bindingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "applicationId": {
+            "type": "string"
+          },
+          "commitSha": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "artifactSha256": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          }
+        }
+      },
+      "ComparisonSummaryResultDto": {
+        "required": [
+          "id",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "beforePublicationId",
+          "afterPublicationId",
+          "sourceApplicationId",
+          "beforeCommitSha",
+          "afterCommitSha",
+          "kind",
+          "baselineRef",
+          "contentChanged",
+          "jsonChanged",
+          "schemaAssessment",
+          "findingCount",
+          "tool",
+          "toolVersion",
+          "comparedAt",
+          "detailUrl",
+          "beforePublicationUrl",
+          "afterPublicationUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "beforePublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "afterPublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "beforeCommitSha": {
+            "type": "string"
+          },
+          "afterCommitSha": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "baselineRef": {
+            "type": "string"
+          },
+          "contentChanged": {
+            "type": "boolean"
+          },
+          "jsonChanged": {
+            "type": "boolean"
+          },
+          "schemaAssessment": {
+            "type": "string"
+          },
+          "findingCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "toolVersion": {
+            "type": "string"
+          },
+          "comparedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detailUrl": {
+            "type": "string"
+          },
+          "beforePublicationUrl": {
+            "type": "string"
+          },
+          "afterPublicationUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "CompatibilityCheckResultDto": {
+        "required": [
+          "required",
+          "status",
+          "reason",
+          "evidenceId",
+          "evidenceUrl",
+          "evidencePayloadSha256",
+          "reportedStatus",
+          "observedVerifier",
+          "observedPublicationId",
+          "buildUrl",
+          "publisherId",
+          "issueCount"
+        ],
+        "type": "object",
+        "properties": {
+          "required": {
+            "$ref": "#/components/schemas/RequiredCheckResultDto"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidenceId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "evidenceUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "evidencePayloadSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reportedStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "observedVerifier": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RequiredCheckResultDto"
+              }
+            ]
+          },
+          "observedPublicationId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "buildUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publisherId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "issueCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CompatibilityDecisionResultDto": {
+        "required": [
+          "id",
+          "policy",
+          "profile",
+          "status",
+          "compatible",
+          "rows",
+          "sourceApplicationId",
+          "publisherId",
+          "evaluatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "policy": {
+            "type": "string"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/VerificationProfileResultDto"
+          },
+          "status": {
+            "type": "string"
+          },
+          "compatible": {
+            "type": "boolean"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompatibilityRowResultDto"
+            }
+          },
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CompatibilityRowRequest": {
+        "required": [
+          "consumerCommitSha",
+          "providerCommitSha",
+          "contractSha256",
+          "ciRunId",
+          "ciAttempt",
+          "providerSourceRef"
+        ],
+        "type": "object",
+        "properties": {
+          "consumerCommitSha": {
+            "type": "string"
+          },
+          "providerCommitSha": {
+            "type": "string"
+          },
+          "contractSha256": {
+            "type": "string"
+          },
+          "ciRunId": {
+            "type": "string"
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "providerSourceRef": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompatibilityRowResultDto": {
+        "required": [
+          "consumerApplicationId",
+          "consumerCommitSha",
+          "providerApplicationId",
+          "providerCommitSha",
+          "consumerVersionId",
+          "providerVersionId",
+          "bindingId",
+          "contractSha256",
+          "ciRunId",
+          "ciAttempt",
+          "providerSourceRef",
+          "status",
+          "checks",
+          "missingChecks",
+          "unresolvedChecks"
+        ],
+        "type": "object",
+        "properties": {
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "consumerCommitSha": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "providerCommitSha": {
+            "type": "string"
+          },
+          "consumerVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "providerVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bindingId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "contractSha256": {
+            "type": "string"
+          },
+          "ciRunId": {
+            "type": "string"
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "providerSourceRef": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompatibilityCheckResultDto"
+            }
+          },
+          "missingChecks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unresolvedChecks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContractArtifactResultDto": {
+        "required": [
+          "sha256",
+          "kind",
+          "specificationVersion",
+          "length",
+          "storedAt",
+          "contentUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "sha256": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "specificationVersion": {
+            "type": "string"
+          },
+          "length": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "storedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contentUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ContractComparisonResultDto": {
+        "required": [
+          "id",
+          "profile",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "before",
+          "after",
+          "baselineRef",
+          "publisherId",
+          "contentChanged",
+          "jsonChanged",
+          "schemaAssessment",
+          "tool",
+          "toolVersion",
+          "findings",
+          "limitations",
+          "consumerImpact",
+          "comparedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "before": {
+            "$ref": "#/components/schemas/ComparisonSourceResultDto"
+          },
+          "after": {
+            "$ref": "#/components/schemas/ComparisonSourceResultDto"
+          },
+          "baselineRef": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "contentChanged": {
+            "type": "boolean"
+          },
+          "jsonChanged": {
+            "type": "boolean"
+          },
+          "schemaAssessment": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "toolVersion": {
+            "type": "string"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SchemaFindingResultDto"
+            }
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consumerImpact": {
+            "type": "string"
+          },
+          "comparedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ContractPublicationResultDto": {
+        "required": [
+          "id",
+          "bindingId",
+          "artifactSha256",
+          "kind",
+          "specificationVersion",
+          "sourceApplicationId",
+          "commitSha",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "sourceRef",
+          "buildUrl",
+          "publisherId",
+          "publishedAt",
+          "contentUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bindingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "artifactSha256": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "specificationVersion": {
+            "type": "string"
+          },
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "commitSha": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contentUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "DecisionSummaryResultDto": {
+        "required": [
+          "id",
+          "profileId",
+          "profileName",
+          "profileVersion",
+          "policy",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "status",
+          "rowCount",
+          "sourceApplicationId",
+          "publisherId",
+          "evaluatedAt",
+          "detailUrl",
+          "profileUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profileName": {
+            "type": "string"
+          },
+          "profileVersion": {
+            "type": "string"
+          },
+          "policy": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "rowCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "evaluatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detailUrl": {
+            "type": "string"
+          },
+          "profileUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "DependencyEdgeResultDto": {
+        "required": [
+          "integration",
+          "relationship",
+          "matchingReports",
+          "integrationUrl",
+          "reportsUrl",
+          "publicationsUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "integration": {
+            "$ref": "#/components/schemas/IntegrationResultDto"
+          },
+          "relationship": {
+            "type": "string"
+          },
+          "matchingReports": {
+            "$ref": "#/components/schemas/VerificationCountsResultDto"
+          },
+          "integrationUrl": {
+            "type": "string"
+          },
+          "reportsUrl": {
+            "type": "string"
+          },
+          "publicationsUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "DependencyGraphResultDto": {
+        "required": [
+          "nodes",
+          "edges",
+          "nextCursor",
+          "selection",
+          "evidencePolicy",
+          "isComplete"
+        ],
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DependencyNodeResultDto"
+            }
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DependencyEdgeResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "selection": {
+            "$ref": "#/components/schemas/EvidenceSelectionResultDto"
+          },
+          "evidencePolicy": {
+            "type": "string"
+          },
+          "isComplete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DependencyNodeResultDto": {
+        "required": [
+          "applicationId",
+          "versionsUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "versionsUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "EvaluateCompatibilityRequest": {
+        "required": [
+          "sourceApplicationId",
+          "profileId",
+          "rows"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "profileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompatibilityRowRequest"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EvidenceSelectionResultDto": {
+        "required": [
+          "applicationId",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "consumerCommitSha",
+          "providerCommitSha",
+          "contractSha256",
+          "sourceRef",
+          "status",
+          "issueCode",
+          "jsonPath",
+          "ciRunId",
+          "ciAttempt",
+          "ciCheckId",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "consumerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "providerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "consumerCommitSha": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "providerCommitSha": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceRef": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "issueCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jsonPath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ciRunId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ciCheckId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "verifierName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "verifierVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "configurationSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "HistoricalIssueResultDto": {
+        "required": [
+          "key",
+          "transition",
+          "before",
+          "after"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "transition": {
+            "type": "string"
+          },
+          "before": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/VerificationIssueResultDto"
+              }
+            ]
+          },
+          "after": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/VerificationIssueResultDto"
+              }
+            ]
+          }
+        }
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "IntegrationResultDto": {
+        "required": [
+          "id",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "registeredAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "registeredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "InventoryCountsResultDto": {
+        "required": [
+          "registeredApplications",
+          "applicationVersions",
+          "declaredIntegrations",
+          "contractPublications",
+          "verificationProfiles",
+          "contractComparisons",
+          "compatibilityDecisions"
+        ],
+        "type": "object",
+        "properties": {
+          "registeredApplications": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "applicationVersions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "declaredIntegrations": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "contractPublications": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "verificationProfiles": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "contractComparisons": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "compatibilityDecisions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "IssueHistoryResultDto": {
+        "required": [
+          "policy",
+          "baselineRef",
+          "comparable",
+          "reason",
+          "before",
+          "after",
+          "issues"
+        ],
+        "type": "object",
+        "properties": {
+          "policy": {
+            "type": "string"
+          },
+          "baselineRef": {
+            "type": "string"
+          },
+          "comparable": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "before": {
+            "$ref": "#/components/schemas/VerificationRunResultDto"
+          },
+          "after": {
+            "$ref": "#/components/schemas/VerificationRunResultDto"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HistoricalIssueResultDto"
+            }
+          }
+        }
+      },
+      "JsonElement": { },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicationSummaryResultDto": {
+        "required": [
+          "id",
+          "bindingId",
+          "sourceVersionId",
+          "sourceApplicationId",
+          "commitSha",
+          "kind",
+          "artifactSha256",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "sourceRef",
+          "buildUrl",
+          "publisherId",
+          "repositoryUrl",
+          "publishedAt",
+          "detailUrl",
+          "contentUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bindingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "commitSha": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "artifactSha256": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detailUrl": {
+            "type": "string"
+          },
+          "contentUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "PublishContractRequest": {
+        "required": [
+          "sourceApplicationId",
+          "commitSha",
+          "kind",
+          "sourceRef",
+          "buildUrl",
+          "contentBase64"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceApplicationId": {
+            "type": "string"
+          },
+          "commitSha": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "consumerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "providerApplicationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "contentBase64": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisterApplicationVersionRequest": {
+        "required": [
+          "commitSha",
+          "repositoryUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "commitSha": {
+            "type": "string"
+          },
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "imageDigest": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisteredApplicationResultDto": {
+        "required": [
+          "applicationId",
+          "versionCount",
+          "versionsUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string"
+          },
+          "versionCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "versionsUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterIntegrationRequest": {
+        "required": [
+          "consumerApplicationId",
+          "providerApplicationId"
+        ],
+        "type": "object",
+        "properties": {
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisterVerificationProfileRequest": {
+        "required": [
+          "consumerApplicationId",
+          "providerApplicationId",
+          "name",
+          "version",
+          "checks"
+        ],
+        "type": "object",
+        "properties": {
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequiredCheckRequest"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegistryOverviewResultDto": {
+        "required": [
+          "inventory",
+          "matchingReports",
+          "selection",
+          "evidencePolicy",
+          "observedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "inventory": {
+            "$ref": "#/components/schemas/InventoryCountsResultDto"
+          },
+          "matchingReports": {
+            "$ref": "#/components/schemas/VerificationCountsResultDto"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/EvidenceSelectionResultDto"
+          },
+          "evidencePolicy": {
+            "type": "string"
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RegistryPageResultDtoOfApplicationVersionResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationVersionResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfComparisonSummaryResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComparisonSummaryResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfDecisionSummaryResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecisionSummaryResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfIntegrationResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfPublicationSummaryResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationSummaryResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfRegisteredApplicationResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegisteredApplicationResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfVerificationProfileResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationProfileResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegistryPageResultDtoOfVerificationSummaryResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationSummaryResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RequiredCheckRequest": {
+        "required": [
+          "checkId",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "verifierName": {
+            "type": "string"
+          },
+          "verifierVersion": {
+            "type": "string"
+          },
+          "configurationSha256": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RequiredCheckResultDto": {
+        "required": [
+          "checkId",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256"
+        ],
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string"
+          },
+          "verifierName": {
+            "type": "string"
+          },
+          "verifierVersion": {
+            "type": "string"
+          },
+          "configurationSha256": {
+            "type": "string"
+          }
+        }
+      },
+      "SchemaFindingResultDto": {
+        "required": [
+          "code",
+          "level",
+          "message",
+          "method",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "method": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VerificationCountsResultDto": {
+        "required": [
+          "passed",
+          "failed",
+          "error",
+          "unverified",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "passed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "failed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "error": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "unverified": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "VerificationIssueRequest": {
+        "required": [
+          "kind",
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "interaction": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jsonPath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expected": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "actualPresent": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "actual": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "evidenceUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerificationIssueResultDto": {
+        "required": [
+          "kind",
+          "code",
+          "message",
+          "interaction",
+          "method",
+          "path",
+          "jsonPath",
+          "actualPresent",
+          "evidenceUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "interaction": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "method": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jsonPath": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "actualPresent": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "evidenceUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expected": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "actual": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        }
+      },
+      "VerificationPageResultDto": {
+        "required": [
+          "items",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationRunResultDto"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "VerificationProfileResultDto": {
+        "required": [
+          "id",
+          "consumerApplicationId",
+          "providerApplicationId",
+          "name",
+          "version",
+          "contentSha256",
+          "checks",
+          "publisherId",
+          "registeredAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "contentSha256": {
+            "type": "string"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequiredCheckResultDto"
+            }
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "registeredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VerificationRunRequest": {
+        "required": [
+          "consumerPublicationId",
+          "consumerApplicationId",
+          "consumerCommitSha",
+          "providerApplicationId",
+          "providerCommitSha",
+          "contractSha256",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256",
+          "ciRunId",
+          "ciAttempt",
+          "ciCheckId",
+          "sourceRef",
+          "buildUrl",
+          "status",
+          "verifiedInteractions",
+          "failedInteractions",
+          "summary",
+          "issues",
+          "evidenceUrls",
+          "startedAt",
+          "finishedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "consumerPublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "consumerCommitSha": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "providerCommitSha": {
+            "type": "string"
+          },
+          "contractSha256": {
+            "type": "string"
+          },
+          "verifierName": {
+            "type": "string"
+          },
+          "verifierVersion": {
+            "type": "string"
+          },
+          "configurationSha256": {
+            "type": "string"
+          },
+          "ciRunId": {
+            "type": "string"
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ciCheckId": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "verifiedInteractions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "failedInteractions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationIssueRequest"
+            }
+          },
+          "evidenceUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerificationRunResultDto": {
+        "required": [
+          "id",
+          "consumerPublicationId",
+          "bindingId",
+          "consumerVersionId",
+          "consumerApplicationId",
+          "consumerCommitSha",
+          "providerVersionId",
+          "providerApplicationId",
+          "providerCommitSha",
+          "contractSha256",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256",
+          "ciRunId",
+          "ciAttempt",
+          "ciCheckId",
+          "sourceRef",
+          "buildUrl",
+          "publisherId",
+          "status",
+          "expectedInteractions",
+          "verifiedInteractions",
+          "failedInteractions",
+          "summary",
+          "issues",
+          "evidenceUrls",
+          "startedAt",
+          "finishedAt",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerPublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bindingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "consumerCommitSha": {
+            "type": "string"
+          },
+          "providerVersionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "providerCommitSha": {
+            "type": "string"
+          },
+          "contractSha256": {
+            "type": "string"
+          },
+          "verifierName": {
+            "type": "string"
+          },
+          "verifierVersion": {
+            "type": "string"
+          },
+          "configurationSha256": {
+            "type": "string"
+          },
+          "ciRunId": {
+            "type": "string"
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ciCheckId": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "expectedInteractions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "verifiedInteractions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "failedInteractions": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerificationIssueResultDto"
+            }
+          },
+          "evidenceUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VerificationSummaryResultDto": {
+        "required": [
+          "id",
+          "consumerApplicationId",
+          "consumerCommitSha",
+          "providerApplicationId",
+          "providerCommitSha",
+          "consumerPublicationId",
+          "contractSha256",
+          "status",
+          "summary",
+          "issueCount",
+          "ciRunId",
+          "ciAttempt",
+          "ciCheckId",
+          "verifierName",
+          "verifierVersion",
+          "configurationSha256",
+          "sourceRef",
+          "buildUrl",
+          "publisherId",
+          "startedAt",
+          "finishedAt",
+          "recordedAt",
+          "detailUrl",
+          "consumerPublicationUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consumerApplicationId": {
+            "type": "string"
+          },
+          "consumerCommitSha": {
+            "type": "string"
+          },
+          "providerApplicationId": {
+            "type": "string"
+          },
+          "providerCommitSha": {
+            "type": "string"
+          },
+          "consumerPublicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractSha256": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "issueCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ciRunId": {
+            "type": "string"
+          },
+          "ciAttempt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ciCheckId": {
+            "type": "string"
+          },
+          "verifierName": {
+            "type": "string"
+          },
+          "verifierVersion": {
+            "type": "string"
+          },
+          "configurationSha256": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          },
+          "buildUrl": {
+            "type": "string"
+          },
+          "publisherId": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detailUrl": {
+            "type": "string"
+          },
+          "consumerPublicationUrl": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "RegistryPublisher": {
+        "type": "http",
+        "description": "Opaque publisher token scoped to application IDs.",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Application versions"
+    },
+    {
+      "name": "Registry browsing and reports"
+    },
+    {
+      "name": "Integrations"
+    },
+    {
+      "name": "Contract publications"
+    },
+    {
+      "name": "Verification runs"
+    },
+    {
+      "name": "Contract changes and issue history"
+    },
+    {
+      "name": "Explicit-version compatibility"
+    }
+  ]
+}
