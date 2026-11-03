@@ -27,8 +27,8 @@ trailing whitespace; it does not change schemas, models, methods or serializers.
 compares the full file set and bytes before and after regeneration, failing on changed, missing or
 extra source files. It also checks the raw upstream hash, forbids unpinned external `$ref` values,
 checks for generated mutation methods and restricts transport imports to infrastructure and the
-application composition root. CI executes this check before lint/build. Existing quality gates stay
-mandatory. Generated files are excluded from lint and coverage, with actual generated request and
+application and lazy registry route composition roots. CI executes this check before lint/build.
+Existing quality gates stay mandatory. Generated files are excluded from lint and coverage, with actual generated request and
 response handling covered through the repositories.
 
 To update a contract:
@@ -65,8 +65,9 @@ isolated between concurrent requests. Effects can use `switchMap` for changing s
 
 The generated client contains the remaining read endpoints too. Domain models and repository ports
 for comparisons, issue history, profiles, compatibility matrices, overview and graph will be added
-with their feature tasks. No empty feature state/effect/facade is introduced. Current section pages
-remain honest empty states; WEB/04 starts connecting these reads to presentation.
+with their feature tasks. No empty feature state/effect/facade is introduced. WEB/04 connects these
+reads to the Applications, Dependencies and Contracts screens. The other section pages remain
+honest empty states until their feature tasks.
 
 ## Evidence and failures
 

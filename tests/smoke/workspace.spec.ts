@@ -1,6 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/backend/api/**', route => route.fulfill({ json: { items: [], nextCursor: null } }));
+});
+
 test('desktop navigation opens every section and marks the active link', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/');
@@ -15,7 +19,8 @@ test('desktop navigation opens every section and marks the active link', async (
     await link.click();
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     await expect(link).toHaveAttribute('aria-current', 'page');
-    await expect(page.getByText('No registry data loaded.', { exact: true })).toBeVisible();
+    if (['Applications', 'Dependencies', 'Contracts'].includes(label)) await expect(page.getByRole('heading', { name: /^No .* found$/ })).toBeVisible();
+    else await expect(page.getByText('No registry data loaded.', { exact: true })).toBeVisible();
   }
 });
 
@@ -54,9 +59,11 @@ test('mobile drawer supports keyboard navigation, closes, and restores the deskt
 test('the overview uses local fonts, no backend evidence, and passes accessibility checks', async ({ page }) => {
   const externalRequests: string[] = [];
   const apiRequests: string[] = [];
+  const explorerRequests: string[] = [];
   page.on('request', (request) => {
     if (!request.url().startsWith('http://127.0.0.1:4200/')) externalRequests.push(request.url());
     if (new URL(request.url()).pathname.startsWith('/backend/')) apiRequests.push(request.url());
+    if (new URL(request.url()).pathname.includes('/features/registry/')) explorerRequests.push(request.url());
   });
   await page.goto('/overview');
   await page.evaluate(() => document.fonts.ready);
@@ -64,6 +71,7 @@ test('the overview uses local fonts, no backend evidence, and passes accessibili
   expect(await page.evaluate(() => document.fonts.check('14px Roboto'))).toBe(true);
   expect(externalRequests).toEqual([]);
   expect(apiRequests).toEqual([]);
+  expect(explorerRequests).toEqual([]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();

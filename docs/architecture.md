@@ -5,8 +5,8 @@
 This is a conventional standalone Angular SPA, following the storefront's Angular 21, Material,
 SCSS and NgRx patterns. `App` composes the shared workspace shell; feature pages load lazily.
 The root redirects to overview. The shared section metadata supplies navigation, route data and
-titles. Non-overview sections temporarily use one shared empty-state page, replaced as each feature
-lands. Unknown addresses retain their URL and offer recovery.
+titles. The registry explorer now owns Applications, Dependencies and Contracts; remaining sections
+use the shared empty-state page until their features land. Unknown addresses retain their URL and offer recovery.
 
 The shell owns only navigation and responsive drawer behavior. Its viewport state uses Angular
 signals/CDK; it does not belong in the business store. NgRx is registered centrally, with DevTools
@@ -38,6 +38,20 @@ reconstruct the database. Each read subscription owns an adapter and AbortContro
 aborts the fetch and prevents stale emissions. No automatic retries or redirects cross this boundary.
 API/DTO/library changes land with their contracts and meaningful tests.
 
+## Registry explorer (WEB/04)
+
+One lazy route group owns the application/version, integration and publication routes, feature state,
+effects, facade and repository bindings. The root keeps only the root store. Route-local providers
+avoid downloading transport infrastructure on shell-only navigation and register the effects once
+across explorer routes. The import guard permits this route composition root to bind infrastructure.
+
+URL parameters are the selection source of truth. Navigation dispatches one request per selection;
+`switchMap` cancels the previous read, and leaving the page cancels reads/downloads and clears state.
+Filter submission removes the old cursor. Paging preserves the filters, and browser back/forward
+restores both values and data. Errors are serializable plain state; failed reads never become empty
+results. An explicit artifact download uses a browser adapter after fetching original bytes; binary
+content never enters the store. See [explorer behavior](explorer.md).
+
 ## Evidence rules
 
 - CI publishes registrations, artifacts, verification reports, comparison snapshots and decisions.
@@ -49,7 +63,7 @@ API/DTO/library changes land with their contracts and meaningful tests.
 - Issue resolution follows comparable requirements and a passing candidate, not requirement removal.
 - Graph edges are declared/tested dependencies, not observed runtime traces or a business sequence.
 - Render diagnostics as text and distinguish absent values from JSON null. Keep design fixtures out
-  of live-data presentation. The foundation intentionally contains no registry examples or calls.
+  of live-data presentation. The shell and overview make no registry calls; the explorer reads registered records without fixtures.
 
 ## Verification and delivery
 

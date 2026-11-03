@@ -1,0 +1,131 @@
+import { readFile } from 'node:fs/promises';
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
+import { consumerCommit, consumerPublication, contractHash, cursor, originalContent, providerCommit, providerPublicationId, publicationId, registryFixture, sourceVersion } from '../fixtures/registry';
+
+test('application → exact version → directed integration → publication preserves identities and downloads original bytes', async ({ page }, testInfo) => {
+  const requests = await registryFixture(page);
+  await page.goto('/applications');
+  await page.getByRole('link', { name: 'payments', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Application versions', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Open exact version', exact: true }).first().click();
+  await expect(page).toHaveURL(`/applications/payments/versions/${consumerCommit}`);
+  await expect(page.getByRole('link', { name: `Commit SHA: ${consumerCommit} (opens in a new tab)`, exact: true })).toHaveAttribute('href', `${sourceVersion.repositoryUrl}/commit/${consumerCommit}`);
+  await expect(page.getByText(sourceVersion.imageDigest, { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Explore declared integrations' }).click();
+  await page.getByRole('link', { name: 'Open integration', exact: true }).click();
+  await expect(page.getByText('Declared', { exact: true })).toBeVisible();
+  await expect(page.getByText('Passed', { exact: true })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Consumer publications', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`commitSha=${consumerCommit}`));
+  await page.getByRole('link', { name: 'Open publication', exact: true }).click();
+  await expect(page.getByText(contractHash, { exact: true })).toHaveCount(2);
+  await expect(page.getByText(consumerPublication.sourceRef, { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: /^CI build:/ })).toHaveAttribute('href', consumerPublication.buildUrl);
+  await expect(page.getByText(consumerPublication.publisherId, { exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Contracts', exact: true })).toHaveAttribute('aria-current', 'page');
+  const downloadEvent = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download original artifact', exact: true }).click();
+  const download = await downloadEvent;
+  expect(download.suggestedFilename()).toBe(`contract-${contractHash}.json`);
+  const path = testInfo.outputPath('original-contract.json'); await download.saveAs(path);
+  expect(await readFile(path, 'utf8')).toBe(originalContent);
+  const publicationQueries = requests.filter(url => new URL(url).pathname === '/backend/api/contract-publications');
+  expect(publicationQueries).toHaveLength(1);
+  const selection = new URL(publicationQueries[0]).searchParams;
+  expect(selection.get('commitSha')).toBe(consumerCommit);
+  expect(selection.get('consumerApplicationId')).toBe('payments');
+  expect(selection.get('providerApplicationId')).toBe('invoice');
+  expect(requests.filter(url => new URL(url).pathname === '/backend/api/integrations/payments/invoice')).toHaveLength(1);
+});
+
+test('opaque cursor paging, filter changes, reload and browser history preserve URL state', async ({ page }) => {
+  const requests = await registryFixture(page);
+  await page.goto('/applications');
+  await page.getByRole('button', { name: 'Next page', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'wallet', exact: true })).toBeVisible();
+  expect(new URL(page.url()).searchParams.get('after')).toBe(cursor);
+  await page.getByLabel('Application ID prefix').fill('pay');
+  await page.getByLabel('Page size', { exact: true }).fill('12');
+  await page.getByRole('button', { name: 'Apply filters' }).click();
+  await expect(page.getByRole('link', { name: 'payments', exact: true })).toBeVisible();
+  expect(new URL(page.url()).searchParams.has('after')).toBe(false);
+  await page.reload();
+  await expect(page.getByLabel('Application ID prefix')).toHaveValue('pay');
+  await expect(page.getByLabel('Page size', { exact: true })).toHaveValue('12');
+  await page.goBack();
+  await expect(page.getByRole('link', { name: 'wallet', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'First page' }).click();
+  await expect(page.getByRole('link', { name: 'payments', exact: true })).toBeVisible();
+  expect(requests.some(url => new URL(url).searchParams.get('after') === cursor)).toBe(true);
+});
+
+test('provider publications use the provider commit without imposing a consumer-only filter', async ({ page }) => {
+  const requests = await registryFixture(page);
+  await page.goto(`/dependencies/payments/invoice?sourceApplicationId=invoice&commitSha=${providerCommit}`);
+  await page.getByRole('link', { name: 'Provider publications', exact: true }).click();
+  await page.getByRole('link', { name: 'Open publication', exact: true }).click();
+  await expect(page.getByText('Not applicable (provider publication)', { exact: true })).toBeVisible();
+  expect(new URL(page.url()).pathname).toBe(`/contracts/${providerPublicationId}`);
+  const query = new URL(requests.find(url => new URL(url).pathname === '/backend/api/contract-publications')!).searchParams;
+  expect(query.get('sourceApplicationId')).toBe('invoice'); expect(query.get('commitSha')).toBe(providerCommit);
+  expect(query.has('consumerApplicationId')).toBe(false);
+});
+
+test('registry unavailable, retry, not-found and cursor validation stay separate from empty results', async ({ page }) => {
+  await registryFixture(page);
+  let unavailable = true;
+  await page.route('**/backend/api/applications*', route => route.fulfill(unavailable ? { status: 503, json: { detail: 'internal database secret', traceId: 'trace-503' } } : { json: { items: [], nextCursor: null } }));
+  await page.goto('/applications');
+  await expect(page.getByRole('heading', { name: 'Registry unavailable' })).toBeVisible();
+  await expect(page.getByText('Trace ID: trace-503')).toBeVisible();
+  await expect(page.getByText('internal database secret')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'No applications found' })).toHaveCount(0);
+  unavailable = false; await page.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'No applications found' })).toBeVisible();
+  await page.goto('/contracts/00000000-0000-0000-0000-000000000000');
+  await expect(page.getByRole('heading', { name: 'Record not found' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Download original artifact' })).toHaveCount(0);
+  await page.route('**/backend/api/contract-publications?*', route => route.fulfill({ status: 400, json: { errors: { after: ['Cursor does not match the selected filters.'] }, traceId: 'trace-cursor' } }));
+  await page.goto('/contracts?sourceApplicationId=payments&after=old-cursor');
+  await expect(page.getByRole('heading', { name: 'Check the filters' })).toBeVisible();
+  await expect(page.getByText('Cursor does not match the selected filters.', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'Clear filters' }).click();
+  expect(new URL(page.url()).searchParams.has('after')).toBe(false);
+});
+
+test('mobile publication details wrap full identities, preserve bookmarks and pass accessibility', async ({ page }) => {
+  await registryFixture(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/contracts/${publicationId}?sourceApplicationId=payments&commitSha=${consumerCommit}`);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Publication provenance' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: 'TestResults/explorer-publication-mobile.png', fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect.poll(async () => Math.round((await page.locator('mat-sidenav-content').boundingBox())?.x ?? 0)).toBe(240);
+  await expect.poll(async () => Math.round((await page.locator('#workspace-navigation').boundingBox())?.x ?? -1)).toBe(0);
+  await page.screenshot({ path: 'TestResults/explorer-publication-desktop.png', fullPage: true });
+  await page.getByRole('navigation', { name: 'Breadcrumb' }).getByRole('link', { name: 'Contracts', exact: true }).click();
+  await expect(page.getByLabel('Exact source commit')).toHaveValue(consumerCommit);
+});
+
+test('loading is observable, invalid URL numbers make no request, and unsafe provenance stays text', async ({ page }) => {
+  const requests = await registryFixture(page);
+  await page.goto('/applications?limit=0');
+  await expect(page.getByRole('heading', { name: 'Check the filters' })).toBeVisible();
+  expect(requests).toEqual([]);
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/backend/api/applications*', async route => { await pending; await route.fulfill({ json: { items: [], nextCursor: null } }); });
+  await page.goto('/applications');
+  await expect(page.getByRole('status')).toHaveText('Loading registry records…');
+  release(); await expect(page.getByRole('heading', { name: 'No applications found' })).toBeVisible();
+  await page.route(`**/backend/api/contract-publications/${publicationId}`, route => route.fulfill({ json: { ...consumerPublication, buildUrl: 'javascript:alert(1)', sourceRef: '<img src=x onerror=alert(1)>' } }));
+  await page.goto(`/contracts/${publicationId}`);
+  await expect(page.getByText('javascript:alert(1)', { exact: true })).toBeVisible();
+  await expect(page.locator('a[href^="javascript:"]')).toHaveCount(0);
+  await expect(page.getByText('<img src=x onerror=alert(1)>', { exact: true })).toBeVisible();
+  await expect(page.locator('app-explorer-page img')).toHaveCount(0);
+});

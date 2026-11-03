@@ -41,6 +41,7 @@
     "@microsoft/kiota-serialization-json": "1.0.0-preview.103",
     "@microsoft/kiota-serialization-multipart": "1.0.0-preview.103",
     "@microsoft/kiota-serialization-text": "1.0.0-preview.103",
+    "@ngrx/effects": "21.0.1",
     "@ngrx/store": "21.0.1",
     "@ngrx/store-devtools": "21.0.1",
     "lossless-json": "4.3.0",

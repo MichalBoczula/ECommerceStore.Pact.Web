@@ -2,11 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { workspaceSections } from './features/core/navigation/workspace-sections';
 
 describe('Workspace routing', () => {
-  beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter(routes)] }));
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response(JSON.stringify({ items: [], nextCursor: null }), { headers: { 'Content-Type': 'application/json' } }))));
+    TestBed.configureTestingModule({ providers: [provideRouter(routes), provideStore()] });
+  });
+  afterEach(() => vi.unstubAllGlobals());
 
   it('opens the overview at the root address', async () => {
     const harness = await RouterTestingHarness.create('/');
@@ -20,7 +25,7 @@ describe('Workspace routing', () => {
       await harness.navigateByUrl(`/${section.path}`);
       expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe(section.title);
       expect(TestBed.inject(Title).getTitle()).toBe(`${section.label} | Pact`);
-      expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
+      if (!['applications', 'dependencies', 'contracts'].includes(section.path)) expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
     }
   });
 
