@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+
+@mixin theme {
+  :root {
+    --pact-blue: #165dde;
+    --pact-blue-dark: #1049b3;
+    --pact-blue-soft: #eaf1ff;
+    --pact-ink: #172235;
+    --pact-muted: #56647b;
+    --pact-page: #f6f8fc;
+    --pact-white: #ffffff;
+    --pact-border: #d9d9d9;
+    --pact-passed: #147d55;
+    --pact-passed-soft: #ebf8f1;
+    --pact-failed: #c63c4b;
+    --pact-failed-soft: #fff0f1;
+    --pact-error: #7955a8;
+    --pact-error-soft: #f4effb;
+    --pact-unverified: #956200;
+    --pact-unverified-soft: #fff5de;
+    --pact-radius-8: 8px;
+    --pact-radius-16: 16px;
+    color-scheme: light;
+    @include mat.theme-overrides((
+      primary: #165dde, on-primary: #ffffff, primary-container: #eaf1ff,
+      on-primary-container: #1049b3, surface: #ffffff, on-surface: #172235,
+      on-surface-variant: #56647b, error: #c63c4b, outline-variant: #d9d9d9,
+      body-large-font: Roboto, body-medium-font: Roboto, label-large-font: Roboto,
+    ));
+    @include mat.button-overrides((
+      filled-container-shape: 8px, filled-container-height: 44px,
+      outlined-container-shape: 8px, outlined-container-height: 44px,
+      text-container-shape: 8px, text-container-height: 44px,
+    ));
+  }
+}

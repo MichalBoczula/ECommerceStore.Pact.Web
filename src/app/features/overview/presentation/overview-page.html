@@ -1,0 +1,27 @@
+<header class="page-heading">
+  <h1>Contract overview</h1>
+  <p>Understand dependencies. Follow each result back to exact evidence.</p>
+</header>
+<section class="welcome-card" aria-labelledby="welcome-title">
+  <span class="eyebrow">ECOMMERCESTORE / CONTRACT INTELLIGENCE</span>
+  <h2 id="welcome-title">Your contract workspace starts here</h2>
+  <p class="welcome-description">Explore application dependencies, inspect verification evidence, and understand compatibility across exact versions.</p>
+  <div class="welcome-actions">
+    <a mat-flat-button routerLink="/applications">Explore applications</a>
+    <a mat-stroked-button routerLink="/dependencies">View dependencies</a>
+  </div>
+  <div class="connection-note">
+    <strong>No registry data loaded</strong>
+    <p>Applications and contract evidence will appear here when registry browsing is connected.</p>
+  </div>
+</section>
+<section class="area-grid" aria-label="Explore the registry">
+  @for (area of areas; track area.path) {
+    <article class="area-card">
+      <h2>{{ area.title }}</h2>
+      <p>{{ area.description }}</p>
+      <a mat-button [routerLink]="area.path">{{ area.label }}</a>
+    </article>
+  }
+</section>
+<p class="evidence-note">A published contract is not a passing verification. Compatibility depends on complete evidence for the selected versions.</p>

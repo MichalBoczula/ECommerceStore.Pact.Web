@@ -1,0 +1,24 @@
+@use 'styles/fonts';
+@use 'styles/tokens';
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+@include tokens.theme;
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { color: var(--pact-ink); background: var(--pact-page); font-family: Roboto, sans-serif; font-size: 14px; line-height: 1.4; }
+button, input, select, textarea { font: inherit; }
+a { color: var(--pact-blue); }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--pact-blue); outline-offset: 3px; }
+.page-heading { margin: 0 0 32px; }
+.page-heading h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.4; font-weight: 700; }
+.page-heading p { margin: 0; color: var(--pact-muted); line-height: 1.6; }
+.empty-state { padding: 32px; border: 1px solid var(--pact-border); border-radius: var(--pact-radius-16); background: var(--pact-white); }
+.section-label { color: var(--pact-blue); font-size: 12px; font-weight: 500; }
+.empty-state h2 { margin: 16px 0; font-size: 24px; line-height: 1.4; }
+.empty-state p { max-width: 680px; color: var(--pact-muted); line-height: 1.7; }
+.empty-state-note { margin: 24px 0; font-size: 13px; }
+@media (max-width: 767px) {
+  .page-heading { margin-bottom: 24px; }
+  .empty-state { padding: 24px; }
+}

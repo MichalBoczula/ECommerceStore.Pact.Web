@@ -1,0 +1,12 @@
+/node_modules/
+/.angular/
+/dist/
+/out-tsc/
+/coverage/
+/TestResults/
+/.tools/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
