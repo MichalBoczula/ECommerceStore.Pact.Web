@@ -1,8 +1,9 @@
 # ECommerceStore.Pact.Web
 
 Angular SPA for the ECommerceStore Pact contract registry. The Angular shell and anonymous API
-read boundary are implemented. Section pages remain intentional empty states until WEB/04-08;
-no sample results are shown as live evidence and the shell does not request registry data.
+read boundary and registry explorer are implemented. Applications, Dependencies and Contracts
+read the registry; overview, verifications, compatibility and issue history retain intentional
+empty states. No sample results are shown as live evidence.
 
 ## Run locally
 
@@ -14,7 +15,7 @@ npm start
 ```
 
 Open http://localhost:4200. No backend, database, publisher token or Azure deployment is required
-to navigate the shell. `/` opens `/overview`. Applications, dependencies, contracts, verifications,
+to navigate the shell; explorer records require the running Pact API. `/` opens `/overview`. Applications, dependencies, contracts, verifications,
 compatibility and issue history have bookmarkable routes. An unknown route has a recovery page.
 
 The read repositories use same-origin `/backend/api/...`. Development strips only `/backend`
@@ -42,10 +43,12 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 
 - Standalone Angular 21, OnPush components, strict TypeScript/templates, Material and SCSS.
 - NgRx root registration and development-only DevTools; feature stores/effects/facades arrive
-  with their screens. Registry and verification repository ports expose handwritten read models;
+  with their screens. The registry explorer has a facade, feature state and cancellable effects.
+  Registry and verification repository ports expose handwritten read models;
   generated Kiota DTOs stay in infrastructure.
 - Seven navigation destinations, responsive Material drawer, active-link semantics, skip link,
-  document titles, and a not-found route. Browser smoke tests cover navigation and accessibility.
+  document titles, and a not-found route. The explorer adds cursor pagination, bookmarkable filters,
+  full provenance and original-byte artifact downloads. Browser smoke covers navigation and accessibility.
 - Roboto and Material Icons are served locally with licenses; no Google Fonts request is required.
 - Distinct theme tokens reserve Passed, Failed, Error and Unverified without assigning statuses
   to records that have no verification evidence.
@@ -53,8 +56,9 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 [Architecture decisions](docs/architecture.md) · [Delivery backlog](TECHNICAL_TODO.md) ·
 [Approved Figma concepts](https://www.figma.com/design/5MNjC3C2tH2MEwBdtw34B5?node-id=5-1661)
 
-The foundation implements the shared shell from the design. Dashboard graphs, counts, filters,
-diagnostics and timelines follow in their backlog items after the API read contracts stabilize.
+The explorer extends the approved shell, cards, typography and Material control patterns.
+See [explorer routes and evidence scope](docs/explorer.md). Dashboard graphs, summary counts,
+verification diagnostics and timelines follow in their backlog items.
 
 ## Related repositories
 
@@ -62,7 +66,7 @@ diagnostics and timelines follow in their backlog items after the API read contr
 - [Angular reference patterns](https://github.com/MichalBoczula/ecommerce-store-web)
 - [Existing Terraform root and state](https://github.com/MichalBoczula/ECommerceStore.Terraform)
 
-WEB/02 is merged in the API; WEB/03 pins its OpenAPI and adds read repositories, mappers, safe
-ProblemDetails errors, cancellation and contract drift checks. Next: WEB/04 builds the application,
-version, integration and publication explorer. Production Nginx/image delivery follows in WEB/10;
+WEB/02 is merged in the API; WEB/03 pins its OpenAPI and adds the read boundary. WEB/04 implements
+the application, version, integration and publication explorer. Next: WEB/05 builds verification
+history and diagnostic details. Production Nginx/image delivery follows in WEB/10;
 CI remains responsible for publishing registry evidence.

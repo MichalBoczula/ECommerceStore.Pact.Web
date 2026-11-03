@@ -1,0 +1,118 @@
+@let vm = view();
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a routerLink="/overview">Overview</a><span aria-hidden="true">/</span>
+  @if (selection().kind === 'versions' || selection().kind === 'version') {
+    <a routerLink="/applications">Applications</a><span aria-hidden="true">/</span>
+    <a [routerLink]="['/applications', params()['applicationId']]">{{ params()['applicationId'] }}</a>
+  } @else if (selection().kind === 'integration') { <a routerLink="/dependencies">Dependencies</a>
+  } @else if (selection().kind === 'publication') { <a routerLink="/contracts" [queryParams]="selection().query">Contracts</a>
+  } @else { <span>{{ title() }}</span> }
+</nav>
+<header class="page-heading explorer-heading">
+  <div><h1>{{ title() }}</h1>
+    <p>@switch (selection().kind) {
+      @case ('applications') { Find applications and the versions behind their contracts. }
+      @case ('versions') { {{ params()['applicationId'] }} · Choose an exact registered commit. }
+      @case ('version') { {{ params()['applicationId'] }} · {{ params()['commitSha'] }} }
+      @case ('integrations') { Directed consumer and provider declarations. A declaration does not establish passing evidence. }
+      @case ('integration') { {{ params()['consumerApplicationId'] }} → {{ params()['providerApplicationId'] }} }
+      @case ('publications') { Immutable artifacts with exact source versions and publication provenance. }
+      @case ('publication') { {{ params()['id'] }} }
+    }</p>
+  </div>
+  <button mat-stroked-button type="button" [disabled]="vm.status === 'loading'" (click)="facade.retry()">Refresh</button>
+</header>
+@if (fields(); as fields) {
+  <form class="filters panel" [formGroup]="form" (ngSubmit)="apply()" aria-label="Registry filters">
+    <div class="filter-fields">
+      @for (field of fields; track field[0]) {
+        <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label>
+          @if (field[0] === 'kind') {
+            <mat-select [formControlName]="field[0]"><mat-option value="">All kinds</mat-option><mat-option value="ConsumerPact">ConsumerPact</mat-option><mat-option value="ProviderOpenApi">ProviderOpenApi</mat-option></mat-select>
+          } @else { <input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false"> }
+        </mat-form-field>
+      }
+      <mat-form-field appearance="outline"><mat-label>Page size</mat-label><input matInput formControlName="limit" type="text" inputmode="numeric" pattern="[0-9]+"></mat-form-field>
+    </div>
+    <div class="actions"><button mat-flat-button type="submit">Apply filters</button><button mat-button type="button" (click)="clear()">Clear filters</button></div>
+  </form>
+}
+@if (context().sourceApplicationId; as applicationId) {
+  <aside class="context-note">Selected source version: <a [routerLink]="['/applications', applicationId, 'versions', context().commitSha]">{{ applicationId }} · {{ context().commitSha }}</a>.
+    Integrations are declarations across applications; they are not versioned verification results.</aside>
+}
+@if (vm.status === 'loading') { <section class="panel loading" role="status" aria-live="polite">Loading registry records…</section> }
+@if (vm.error; as error) { <app-registry-error-panel [error]="error" (retry)="facade.retry()" /> }
+@if (vm.data; as data) {
+  @switch (data.kind) {
+    @case ('applications') {
+      <section class="record-grid" aria-label="Registered applications">
+        @for (application of data.page.items; track application.applicationId) {
+          <article class="panel record-card"><span class="eyebrow">APPLICATION</span><h2><a [routerLink]="['/applications', application.applicationId]">{{ application.applicationId }}</a></h2>
+            <p>{{ application.versionCount }} registered version(s)</p><a mat-button [routerLink]="['/applications', application.applicationId]">Browse versions</a>
+          </article>
+        } @empty { <section class="panel empty"><h2>No applications found</h2><p>No registered applications match the current filters.</p></section> }
+      </section>
+    }
+    @case ('versions') {
+      <div class="actions section-actions"><a mat-stroked-button routerLink="/dependencies" [queryParams]="{ applicationId: params()['applicationId'] }">Declared integrations</a><a mat-stroked-button routerLink="/contracts" [queryParams]="{ sourceApplicationId: params()['applicationId'] }">All publications</a></div>
+      <section class="record-list" aria-label="Registered versions">
+        @for (version of data.page.items; track version.id) {
+          <article class="panel record-card"><span class="eyebrow">REGISTERED COMMIT</span><h2 class="identity"><a [routerLink]="['/applications', version.applicationId, 'versions', version.commitSha]">{{ version.commitSha }}</a></h2>
+            <app-record-fields [fields]="versionFields(version)" />
+            <a mat-button [routerLink]="['/applications', version.applicationId, 'versions', version.commitSha]">Open exact version</a>
+          </article>
+        } @empty { <section class="panel empty"><h2>No versions found</h2><p>No registered versions match this application and page.</p></section> }
+      </section>
+    }
+    @case ('version') {
+      <section class="panel"><h2>Source version</h2><app-record-fields [fields]="versionFields(data.version)" />
+        <div class="actions"><a mat-flat-button routerLink="/dependencies" [queryParams]="{ applicationId: data.version.applicationId, sourceApplicationId: data.version.applicationId, commitSha: data.version.commitSha }">Explore declared integrations</a>
+          <a mat-stroked-button routerLink="/contracts" [queryParams]="{ sourceApplicationId: data.version.applicationId, commitSha: data.version.commitSha }">Publications for this commit</a></div>
+      </section>
+    }
+    @case ('integrations') {
+      <section class="record-grid" aria-label="Declared integrations">
+        @for (integration of data.page.items; track integration.id) {
+          <article class="panel record-card"><span class="kind-label">Declared</span><h2><a [routerLink]="['/dependencies', integration.consumerApplicationId, integration.providerApplicationId]" [queryParams]="context()">{{ integration.consumerApplicationId }} → {{ integration.providerApplicationId }}</a></h2>
+            <p>Consumer → provider</p><p class="identity">{{ integration.id }}</p>
+            <a mat-button [routerLink]="['/dependencies', integration.consumerApplicationId, integration.providerApplicationId]" [queryParams]="context()">Open integration</a>
+          </article>
+        } @empty { <section class="panel empty"><h2>No integrations found</h2><p>No declared integrations match the current filters.</p></section> }
+      </section>
+    }
+    @case ('integration') {
+      <section class="panel"><span class="kind-label">Declared</span><h2>Consumer → provider</h2><app-record-fields [fields]="integrationFields(data.integration)" />
+        <div class="actions"><a mat-stroked-button [routerLink]="['/applications', data.integration.consumerApplicationId]">Consumer versions</a><a mat-stroked-button [routerLink]="['/applications', data.integration.providerApplicationId]">Provider versions</a></div>
+      </section>
+      <section class="panel"><h2>Contract publications</h2><p>Choose consumer requirements or the provider schema. These publications are separate from verification outcomes.</p>
+        <div class="actions"><a mat-flat-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'consumer')">Consumer publications</a><a mat-stroked-button routerLink="/contracts" [queryParams]="publicationsFor(data.integration, 'provider')">Provider publications</a></div>
+      </section>
+    }
+    @case ('publications') {
+      <section class="record-list" aria-label="Contract publications">
+        @for (publication of data.page.items; track publication.id) {
+          <article class="panel record-card"><span class="kind-label">{{ publication.kind }}</span><h2><a [routerLink]="['/contracts', publication.id]" [queryParams]="selection().query">@if (publication.consumerApplicationId) { {{ publication.consumerApplicationId }} → {{ publication.providerApplicationId }} } @else { {{ publication.providerApplicationId }} / provider schema }</a></h2>
+            <dl class="summary"><div><dt>Commit SHA</dt><dd class="identity">{{ publication.commitSha }}</dd></div><div><dt>Contract SHA256</dt><dd class="identity">{{ publication.artifactSha256 }}</dd></div><div><dt>Published (UTC)</dt><dd>{{ publication.publishedAt | date:'medium':'UTC' }}</dd></div></dl>
+            <a mat-button [routerLink]="['/contracts', publication.id]" [queryParams]="selection().query">Open publication</a>
+          </article>
+        } @empty { <section class="panel empty"><h2>No publications found</h2><p>No contract publications match the current filters.</p></section> }
+      </section>
+    }
+    @case ('publication') {
+      <section class="panel"><span class="kind-label">{{ data.publication.kind }}</span><h2>Publication provenance</h2><app-record-fields [fields]="publicationFields(data.publication)" /></section>
+      <section class="panel"><h2>Source version</h2><app-record-fields [fields]="versionFields(data.version)" /><a mat-button [routerLink]="['/applications', data.version.applicationId, 'versions', data.version.commitSha]">Open source version</a></section>
+      <section class="panel"><h2>Original artifact</h2><app-record-fields [fields]="artifactFields(data.artifact)" />
+        <p>Downloads preserve the original bytes. Publication alone does not establish passing verification or compatibility.</p>
+        <button mat-flat-button type="button" [disabled]="vm.download === 'loading'" (click)="facade.download()">{{ vm.download === 'loading' ? 'Downloading…' : 'Download original artifact' }}</button>
+        @if (vm.download === 'saved') { <p role="status">Artifact download started.</p> }
+        @if (vm.downloadError; as error) { <app-registry-error-panel [error]="error" (retry)="facade.download()" /> }
+      </section>
+    }
+  }
+}
+@if (page(); as page) {
+  <nav class="pagination" aria-label="Registry pagination"><p>Showing {{ page.items.length }} record(s) on this page.</p>
+    <div class="actions"><button mat-stroked-button type="button" [disabled]="!selection().query['after']" (click)="facade.page(null)">First page</button><button mat-stroked-button type="button" [disabled]="!page.nextCursor" (click)="facade.page(page.nextCursor)">Next page</button></div>
+  </nav>
+}

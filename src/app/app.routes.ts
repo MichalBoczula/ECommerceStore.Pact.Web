@@ -1,9 +1,12 @@
-import { Routes } from '@angular/router';
+import { CanMatchFn, Routes } from '@angular/router';
 import { workspaceSections } from './features/core/navigation/workspace-sections';
+
+const registryRoute: CanMatchFn = (_route, segments) => ['applications', 'dependencies', 'contracts'].includes(segments[0]?.path);
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'overview' },
-  ...workspaceSections.map((section) => ({
+  { path: '', canMatch: [registryRoute], loadChildren: () => import('./features/registry/registry.routes').then(m => m.REGISTRY_ROUTES) },
+  ...workspaceSections.filter(section => !['applications', 'dependencies', 'contracts'].includes(section.path)).map((section) => ({
     path: section.path,
     title: `${section.label} | Pact`,
     data: { section },
