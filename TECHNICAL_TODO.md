@@ -9,8 +9,8 @@ The backend's PACT/09 source-CI pilot and the final hosted acceptance remain exp
 | WEB/02 | Dashboard read API (Pact API repository) | Merged ([API #9](https://github.com/MichalBoczula/ECommerceStore.Pact/pull/9)); CI passed | Backend evidence model |
 | WEB/03 | Pinned Kiota client, repositories, mappers and errors | Merged ([#2](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/2)); CI passed | 01, 02 |
 | WEB/04 | Application, version, integration and contract explorer | Merged ([#3](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/3)); CI passed | 03 |
-| WEB/05 | Verification history and diagnostic details | Implemented; PR verification in progress | 03, 04 |
-| WEB/06 | Contract comparisons and comparable issue history | Planned | 05 |
+| WEB/05 | Verification history and diagnostic details | Merged ([#4](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/4)); CI passed | 03, 04 |
+| WEB/06 | Contract comparisons and comparable issue history | Implemented; PR verification in progress | 05 |
 | WEB/07 | Explicit-version compatibility matrices | Planned | 03, 04 |
 | WEB/08 | Overview and directed dependency graph | Planned | 04, 05, 07 |
 | WEB/09 | Registry-backed browser acceptance | Planned | 04-08 |

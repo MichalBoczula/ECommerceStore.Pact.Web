@@ -63,11 +63,11 @@ isolated between concurrent requests. Effects can use `switchMap` for changing s
 | `RegistryRepository` | Application discovery, exact versions, directed integrations, publication discovery/details, artifact metadata and original content bytes |
 | `VerificationRepository` | Filtered paginated report discovery and exact run details |
 
-The generated client contains the remaining read endpoints too. Domain models and repository ports
-for comparisons, issue history, profiles, compatibility matrices, overview and graph will be added
-with their feature tasks. No empty feature state/effect/facade is introduced. WEB/04 connects registry
+The generated client contains the remaining read endpoints too. History repository ports/models are implemented in WEB/06; profiles, compatibility matrices,
+overview and graph will be added with their feature tasks. No empty feature state/effect/facade is introduced. WEB/04 connects registry
 reads to Applications, Dependencies and Contracts; WEB/05 connects verification history and details.
-The remaining section pages stay honest empty states until their feature tasks.
+WEB/06 adds stored comparisons and explicit issue history. Overview and compatibility remain
+honest empty states until their feature tasks.
 
 ## Evidence and failures
 

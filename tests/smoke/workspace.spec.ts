@@ -20,6 +20,7 @@ test('desktop navigation opens every section and marks the active link', async (
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     await expect(link).toHaveAttribute('aria-current', 'page');
     if (['Applications', 'Dependencies', 'Contracts', 'Verifications'].includes(label)) await expect(page.getByRole('heading', { name: /^No .* found$/ })).toBeVisible();
+    else if (label === 'Issue history') await expect(page.getByRole('heading', { name: 'Choose explicit runs', exact: true })).toBeVisible();
     else await expect(page.getByText('No registry data loaded.', { exact: true })).toBeVisible();
   }
 });

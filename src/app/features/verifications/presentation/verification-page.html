@@ -74,6 +74,7 @@
     <details class="panel provenance"><summary>Full report provenance</summary><app-record-fields [fields]="provenance(run)" /></details>
     <section class="panel"><h2>Evidence links</h2><div class="actions">
       <a mat-stroked-button [routerLink]="['/contracts', run.consumerPublicationId]">Consumer publication</a>
+      <a mat-stroked-button routerLink="/issue-history" [queryParams]="{ beforeRunId: run.id, baselineRef: run.sourceRef }">Use as baseline for issue history</a>
       <button mat-stroked-button type="button" [disabled]="vm.download === 'loading'" (click)="facade.download()">{{ vm.download === 'loading' ? 'Downloading…' : 'Download consumer Pact' }}</button>
     </div>
       @if (vm.download === 'started') { <p role="status">Artifact download started.</p> }

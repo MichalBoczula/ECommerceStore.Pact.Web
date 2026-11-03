@@ -1,7 +1,7 @@
 import { stringify } from 'lossless-json';
 import { VerificationRunResultDto, VerificationSummaryResultDto, VerificationIssueResultDto } from '../../../shared/infrastructure/api-clients/pact/models';
 import { object } from '../../../shared/infrastructure/problem-details';
-import { count, invalidResponse, optionalText, text, timestamp } from '../../../shared/infrastructure/read-mapping';
+import { boolean, count, invalidResponse, optionalText, text, timestamp } from '../../../shared/infrastructure/read-mapping';
 import { DiagnosticValue, VerificationEvidence, VerificationIssue, VerificationRun, VerificationStatus, VerificationSummary } from '../domain/verification.models';
 
 function status(value: unknown): VerificationStatus {
@@ -32,7 +32,7 @@ function diagnostic(raw: Record<string, unknown>, name: string): DiagnosticValue
   return typeof json === 'string' ? { present: true, json } : invalidResponse();
 }
 
-function issue(dto: VerificationIssueResultDto, raw: unknown): VerificationIssue {
+export function verificationIssue(dto: VerificationIssueResultDto, raw: unknown): VerificationIssue {
   const source = object(raw);
   if (!source) return invalidResponse();
   return {
@@ -41,6 +41,19 @@ function issue(dto: VerificationIssueResultDto, raw: unknown): VerificationIssue
     actualPresent: dto.actualPresent ?? null, evidenceUrl: optionalText(dto.evidenceUrl),
     expected: diagnostic(source, 'expected'), actual: diagnostic(source, 'actual'),
   };
+}
+
+/** Kiota 1.34's nullable history-issue union chooses its empty branch. Map that side's metadata
+ * from the same captured body; diagnostics still use the shared lossless value mapping. */
+export function historicalVerificationIssue(raw: unknown): VerificationIssue | null {
+  if (raw === null) return null;
+  const value = object(raw);
+  if (!value) return invalidResponse();
+  return verificationIssue({
+    kind: text(value['kind']), code: text(value['code']), message: text(value['message']), interaction: optionalText(value['interaction']),
+    method: optionalText(value['method']), path: optionalText(value['path']), jsonPath: optionalText(value['jsonPath']),
+    evidenceUrl: optionalText(value['evidenceUrl']), actualPresent: value['actualPresent'] == null ? null : boolean(value['actualPresent']),
+  }, value);
 }
 
 export function verificationRun(dto: VerificationRunResultDto, raw: unknown): VerificationRun {
@@ -52,6 +65,6 @@ export function verificationRun(dto: VerificationRunResultDto, raw: unknown): Ve
   return {
     ...evidence(dto), bindingId: text(dto.bindingId), consumerVersionId: text(dto.consumerVersionId), providerVersionId: text(dto.providerVersionId),
     expectedInteractions: count(dto.expectedInteractions), verifiedInteractions: count(dto.verifiedInteractions), failedInteractions: count(dto.failedInteractions),
-    issues: dto.issues.map((value, index) => issue(value, issues[index])), evidenceUrls: dto.evidenceUrls.map(text),
+    issues: dto.issues.map((value, index) => verificationIssue(value, issues[index])), evidenceUrls: dto.evidenceUrls.map(text),
   };
 }
