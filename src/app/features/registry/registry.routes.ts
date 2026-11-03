@@ -2,9 +2,9 @@ import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { Routes } from '@angular/router';
 import { provideRegistryReads } from '../../shared/infrastructure/registry.providers';
-import { ArtifactDownloads } from './application/explorer.models';
+import { ArtifactDownloads } from '../../shared/domain/artifact-downloads';
 import { ExplorerFacade } from './application/explorer.facade';
-import { BrowserArtifactDownloads } from './infrastructure/browser-artifact-downloads';
+import { BrowserArtifactDownloads } from '../../shared/infrastructure/browser-artifact-downloads';
 import { explorerFeature } from './state/explorer.feature';
 import { ExplorerEffects } from './state/explorer.effects';
 

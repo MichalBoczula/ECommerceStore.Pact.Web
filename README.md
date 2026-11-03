@@ -1,9 +1,9 @@
 # ECommerceStore.Pact.Web
 
 Angular SPA for the ECommerceStore Pact contract registry. The Angular shell and anonymous API
-read boundary and registry explorer are implemented. Applications, Dependencies and Contracts
-read the registry; overview, verifications, compatibility and issue history retain intentional
-empty states. No sample results are shown as live evidence.
+read boundary, registry explorer and verification history/details are implemented. Applications,
+Dependencies, Contracts and Verifications read the registry; overview, compatibility and issue
+history retain intentional empty states. No sample results are shown as live evidence.
 
 ## Run locally
 
@@ -43,12 +43,14 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 
 - Standalone Angular 21, OnPush components, strict TypeScript/templates, Material and SCSS.
 - NgRx root registration and development-only DevTools; feature stores/effects/facades arrive
-  with their screens. The registry explorer has a facade, feature state and cancellable effects.
+  with their screens. The registry explorer and verification evidence have facades, feature state
+  and cancellable effects.
   Registry and verification repository ports expose handwritten read models;
   generated Kiota DTOs stay in infrastructure.
 - Seven navigation destinations, responsive Material drawer, active-link semantics, skip link,
   document titles, and a not-found route. The explorer adds cursor pagination, bookmarkable filters,
-  full provenance and original-byte artifact downloads. Browser smoke covers navigation and accessibility.
+  full provenance and original-byte artifact downloads. Verification views add exact evidence filters,
+  four distinct statuses and lossless expected/actual diagnostics. Browser smoke covers accessibility.
 - Roboto and Material Icons are served locally with licenses; no Google Fonts request is required.
 - Distinct theme tokens reserve Passed, Failed, Error and Unverified without assigning statuses
   to records that have no verification evidence.
@@ -57,8 +59,9 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 [Approved Figma concepts](https://www.figma.com/design/5MNjC3C2tH2MEwBdtw34B5?node-id=5-1661)
 
 The explorer extends the approved shell, cards, typography and Material control patterns.
-See [explorer routes and evidence scope](docs/explorer.md). Dashboard graphs, summary counts,
-verification diagnostics and timelines follow in their backlog items.
+See [explorer routes and evidence scope](docs/explorer.md) and [verification history and details](docs/verifications.md).
+Dashboard graphs, summary counts, contract comparisons and comparable issue timelines follow in
+their backlog items.
 
 ## Related repositories
 
@@ -67,6 +70,6 @@ verification diagnostics and timelines follow in their backlog items.
 - [Existing Terraform root and state](https://github.com/MichalBoczula/ECommerceStore.Terraform)
 
 WEB/02 is merged in the API; WEB/03 pins its OpenAPI and adds the read boundary. WEB/04 implements
-the application, version, integration and publication explorer. Next: WEB/05 builds verification
-history and diagnostic details. Production Nginx/image delivery follows in WEB/10;
+the application, version, integration and publication explorer. WEB/05 adds verification history
+and diagnostic details. Next: WEB/06 adds stored contract comparisons and comparable issue history. Production Nginx/image delivery follows in WEB/10;
 CI remains responsible for publishing registry evidence.

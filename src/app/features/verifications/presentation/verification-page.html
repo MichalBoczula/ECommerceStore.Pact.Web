@@ -1,0 +1,84 @@
+@let vm = view();
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a routerLink="/overview">Overview</a><span aria-hidden="true">/</span>
+  @if (selection().id) { <a routerLink="/verifications" [queryParams]="selection().query">Verifications</a><span aria-hidden="true">/</span><span>Run details</span> }
+  @else { <span>Verifications</span> }
+</nav>
+<header class="page-heading verification-heading"><div><h1>{{ title() }}</h1>
+  <p>@if (selection().id; as id) { Verification {{ id }} } @else { Recorded executions for explicit consumer, provider and CI evidence selections. }</p></div>
+  <button mat-stroked-button type="button" [disabled]="vm.status === 'loading'" (click)="facade.retry()">Refresh</button>
+</header>
+@if (!selection().id) {
+  <form class="panel filters" [formGroup]="form" (ngSubmit)="apply()" aria-label="Verification filters">
+    <div class="filter-grid">
+      @for (field of primary; track field[0]) { <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label><input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false"></mat-form-field> }
+      <mat-form-field appearance="outline"><mat-label>Recorded status</mat-label><mat-select formControlName="status"><mat-option value="">Any recorded status</mat-option>
+        @for (status of statuses; track status) { <mat-option [value]="status">{{ status }}</mat-option> }
+        @if (invalidStatus(); as status) { <mat-option [value]="status">Unsupported: {{ status }}</mat-option> }
+      </mat-select></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Page size</mat-label><input matInput formControlName="limit" inputmode="numeric" pattern="[0-9]+"></mat-form-field>
+    </div>
+    <details class="advanced" [open]="advancedOpen()"><summary>Exact evidence and issue filters</summary><div class="filter-grid">
+      @for (field of advanced; track field[0]) { <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label><input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false" [attr.inputmode]="field[0] === 'ciAttempt' ? 'numeric' : null"></mat-form-field> }
+    </div></details>
+    <div class="actions"><button mat-flat-button type="submit">Apply filters</button><button mat-button type="button" (click)="clear()">Clear filters</button></div>
+  </form>
+  <p class="evidence-note">Report history is not a compatibility decision. No matching report means no evidence for these filters.</p>
+}
+@if (vm.status === 'loading') { <section class="panel" role="status">Loading verification evidence…</section> }
+@if (vm.error; as error) { <app-registry-error-panel [error]="error" (retry)="facade.retry()" /> }
+@if (vm.data; as data) {
+  @if (data.kind === 'history') {
+    <section aria-label="Recorded verification runs">
+      @for (run of data.page.items; track run.id) {
+        <article class="panel history-card"><div class="history-heading"><app-evidence-status [status]="run.status" /><span>{{ run.issueCount }} recorded issue(s)</span></div>
+          <h2><a [routerLink]="['/verifications', run.id]" [queryParams]="selection().query">{{ run.consumerApplicationId }} → {{ run.providerApplicationId }}</a></h2>
+          <p>{{ run.summary || 'No summary supplied.' }}</p><p class="identity">{{ run.id }}</p>
+          <app-record-fields [fields]="summaryFields(run)" /><p class="timestamp">Recorded {{ run.recordedAt | date:'medium':'UTC' }} UTC</p>
+          <a mat-button [routerLink]="['/verifications', run.id]" [queryParams]="selection().query">Open verification run</a>
+        </article>
+      } @empty { <section class="panel"><h2>No verification runs found</h2><p>No recorded executions match the selected filters. This does not establish a passing result.</p></section> }
+    </section>
+    <nav class="pagination" aria-label="Verification pagination"><p>Showing {{ data.page.items.length }} run(s) on this page.</p><div class="actions">
+      <button mat-stroked-button type="button" [disabled]="!selection().query['after']" (click)="facade.page(null)">First page</button><button mat-stroked-button type="button" [disabled]="!data.page.nextCursor" (click)="facade.page(data.page.nextCursor)">Next page</button>
+    </div></nav>
+  } @else {
+    @let run = data.run;
+    <section [class]="'panel result-summary result-' + run.status" aria-label="Recorded verification result"><div class="result-heading"><app-evidence-status [status]="run.status" /><p>{{ run.summary || 'No summary supplied.' }}</p></div>
+      <p class="identity">Contract SHA256: {{ run.contractSha256 }}</p><p class="evidence-note">This is the recorded verification outcome for the pinned evidence. It does not establish a compatibility decision.</p>
+    </section>
+    <section class="pinned-grid" aria-label="Pinned evidence">
+      <article class="panel pinned-card"><h2>Consumer</h2><h3>{{ run.consumerApplicationId }}</h3><a class="identity" [routerLink]="['/applications', run.consumerApplicationId, 'versions', run.consumerCommitSha]">{{ run.consumerCommitSha }}</a>
+        @if (consumerCommitUrl(); as url) { <a mat-button [href]="url" target="_blank" rel="noopener noreferrer">Consumer commit on GitHub</a> }
+        @if (vm.sources?.consumer?.error) { <p class="link-note">Consumer repository link unavailable. The recorded commit remains available above.</p> }
+      </article>
+      <article class="panel pinned-card"><h2>Provider</h2><h3>{{ run.providerApplicationId }}</h3><a class="identity" [routerLink]="['/applications', run.providerApplicationId, 'versions', run.providerCommitSha]">{{ run.providerCommitSha }}</a>
+        @if (providerCommitUrl(); as url) { <a mat-button [href]="url" target="_blank" rel="noopener noreferrer">Provider commit on GitHub</a> }
+        @if (vm.sources?.provider?.error) { <p class="link-note">Provider repository link unavailable. The recorded commit remains available above.</p> }
+      </article>
+      <article class="panel pinned-card"><h2>CI execution</h2><h3 class="identity">Run {{ run.ciRunId }}</h3><p>Attempt {{ run.ciAttempt }}</p><p class="identity">Check: {{ run.ciCheckId }}</p>
+        @if (webUrl(run.buildUrl); as url) { <a mat-stroked-button [href]="url" target="_blank" rel="noopener noreferrer">Open CI run</a> }
+      </article>
+    </section>
+    <section class="panel"><h2>Recorded interactions</h2><dl class="counts"><div><dt>Expected</dt><dd>{{ run.expectedInteractions }}</dd></div><div><dt>Verified</dt><dd>{{ run.verifiedInteractions }}</dd></div><div><dt>Failed</dt><dd>{{ run.failedInteractions }}</dd></div></dl></section>
+    <section aria-label="Verification issues">
+      @for (issue of run.issues; track $index; let index = $index) {
+        <article class="panel issue"><h2>{{ issue.code }} · {{ issue.kind }}</h2><p class="issue-message">{{ issue.message }}</p>
+          <app-record-fields [fields]="[{ label: 'Interaction', value: issue.interaction ?? 'Not supplied' }, { label: 'Method', value: issue.method ?? 'Not supplied' }, { label: 'Path', value: issue.path ?? 'Not supplied' }, { label: 'JSON path', value: issue.jsonPath ?? 'Not supplied' }]" />
+          <div class="diagnostics"><section class="expected" [attr.aria-label]="'Expected value for issue ' + (index + 1)"><h3>Expected</h3><app-diagnostic-value [value]="issue.expected" label="Expected" /></section>
+            <section class="actual" [attr.aria-label]="'Actual value for issue ' + (index + 1)"><h3>Actual</h3><app-diagnostic-value [value]="issue.actual" label="Actual" /></section></div>
+          <p class="evidence-note">actualPresent: {{ issue.actualPresent === null ? 'not reported' : issue.actualPresent }} · Missing values and JSON null remain distinct.</p>
+          @if (issue.evidenceUrl; as url) { <app-record-fields [fields]="[{ label: 'Issue evidence', value: url, href: url }]" /> }
+        </article>
+      } @empty { <section class="panel"><h2>No issues recorded</h2><p>Use the recorded status above. An empty issue list does not establish a passing result.</p></section> }
+    </section>
+    <details class="panel provenance"><summary>Full report provenance</summary><app-record-fields [fields]="provenance(run)" /></details>
+    <section class="panel"><h2>Evidence links</h2><div class="actions">
+      <a mat-stroked-button [routerLink]="['/contracts', run.consumerPublicationId]">Consumer publication</a>
+      <button mat-stroked-button type="button" [disabled]="vm.download === 'loading'" (click)="facade.download()">{{ vm.download === 'loading' ? 'Downloading…' : 'Download consumer Pact' }}</button>
+    </div>
+      @if (vm.download === 'started') { <p role="status">Artifact download started.</p> }
+      @if (vm.downloadError; as error) { <app-registry-error-panel [error]="error" (retry)="facade.download()" /> }
+      @if (run.evidenceUrls.length) { <app-record-fields [fields]="evidence(run)" /> } @else { <p>No additional evidence links recorded.</p> }
+    </section>
+  }
+}

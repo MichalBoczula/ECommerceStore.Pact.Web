@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { inject, Injectable } from '@angular/core';
-import { ArtifactDownloads } from '../application/explorer.models';
+import { ArtifactDownloads } from '../domain/artifact-downloads';
 
 @Injectable()
 export class BrowserArtifactDownloads extends ArtifactDownloads {

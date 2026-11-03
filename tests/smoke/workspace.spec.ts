@@ -19,15 +19,15 @@ test('desktop navigation opens every section and marks the active link', async (
     await link.click();
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     await expect(link).toHaveAttribute('aria-current', 'page');
-    if (['Applications', 'Dependencies', 'Contracts'].includes(label)) await expect(page.getByRole('heading', { name: /^No .* found$/ })).toBeVisible();
+    if (['Applications', 'Dependencies', 'Contracts', 'Verifications'].includes(label)) await expect(page.getByRole('heading', { name: /^No .* found$/ })).toBeVisible();
     else await expect(page.getByText('No registry data loaded.', { exact: true })).toBeVisible();
   }
 });
 
 test('a direct section address survives reload and unknown addresses offer recovery', async ({ page }) => {
-  await page.goto('/verifications?provider=invoice');
+  await page.goto('/verifications?providerApplicationId=invoice');
   await page.reload();
-  await expect(page).toHaveURL(/\/verifications\?provider=invoice$/);
+  await expect(page).toHaveURL(/\/verifications\?providerApplicationId=invoice$/);
   await expect(page.getByRole('heading', { name: 'Verification evidence', exact: true })).toBeVisible();
   await page.goto('/unknown/record');
   await expect(page.getByRole('heading', { name: 'Page not found', exact: true })).toBeVisible();

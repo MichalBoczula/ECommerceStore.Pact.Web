@@ -5,8 +5,8 @@
 This is a conventional standalone Angular SPA, following the storefront's Angular 21, Material,
 SCSS and NgRx patterns. `App` composes the shared workspace shell; feature pages load lazily.
 The root redirects to overview. The shared section metadata supplies navigation, route data and
-titles. The registry explorer now owns Applications, Dependencies and Contracts; remaining sections
-use the shared empty-state page until their features land. Unknown addresses retain their URL and offer recovery.
+titles. The registry explorer owns Applications, Dependencies and Contracts; verification evidence
+owns Verifications. Remaining sections use the shared empty-state page until their features land. Unknown addresses retain their URL and offer recovery.
 
 The shell owns only navigation and responsive drawer behavior. Its viewport state uses Angular
 signals/CDK; it does not belong in the business store. NgRx is registered centrally, with DevTools
@@ -52,6 +52,20 @@ restores both values and data. Errors are serializable plain state; failed reads
 results. An explicit artifact download uses a browser adapter after fetching original bytes; binary
 content never enters the store. See [explorer behavior](explorer.md).
 
+## Verification evidence (WEB/05)
+
+A separate lazy route group owns filtered history and exact report details with its own facade,
+state and effects. It reuses the reviewed verification repository and shared provenance fields,
+error mapping/panels and browser download adapter. These shared pieces contain no feature state.
+The import guard permits both route composition roots to bind infrastructure.
+
+The URL is the history selection source of truth. Query changes cancel previous reads and reset
+stale data; applying filters removes the old cursor. Exact run routes fetch by report ID only and
+retain the history query for the breadcrumb. Primary report data renders before supplementary
+registered-version lookups. Those lookups validate exact identities, cancel on selection changes
+and cannot hide the report when a repository link is unavailable. Binary downloads stay outside
+the store. See [verification behavior](verifications.md).
+
 ## Evidence rules
 
 - CI publishes registrations, artifacts, verification reports, comparison snapshots and decisions.
@@ -63,7 +77,8 @@ content never enters the store. See [explorer behavior](explorer.md).
 - Issue resolution follows comparable requirements and a passing candidate, not requirement removal.
 - Graph edges are declared/tested dependencies, not observed runtime traces or a business sequence.
 - Render diagnostics as text and distinguish absent values from JSON null. Keep design fixtures out
-  of live-data presentation. The shell and overview make no registry calls; the explorer reads registered records without fixtures.
+  of live-data presentation. The shell and overview make no registry calls; explorer and verification views read registered
+  records without fixtures.
 
 ## Verification and delivery
 
@@ -78,4 +93,4 @@ The build job also verifies the snapshot hash, infrastructure import boundary an
 regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated
 serialization is exercised by repository tests. WEB/10 will add build-once scanned-image publication.
 WEB/11 reuses the existing Terraform root/state and ACA environment. No image publishing, Terraform
-apply or cloud readiness is part of WEB/01-03.
+apply or cloud readiness is part of WEB/01-05.

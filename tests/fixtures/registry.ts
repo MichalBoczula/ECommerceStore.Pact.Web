@@ -13,10 +13,10 @@ const date = '2026-11-03T10:30:00.000Z';
 export const originalContent = '{\n  "amount": 9007199254740993,\n  "memo": "<script>text only</script>",\n  "nullable": null\n}\n';
 export const cursor = 'opaque+/=&?cursor';
 export const sourceVersion = { id: versionId, applicationId: 'payments', commitSha: consumerCommit, repositoryUrl: 'https://github.com/example/payments', imageDigest: `sha256:${'56'.repeat(32)}`, registeredAt: date };
-export const providerVersion = { ...sourceVersion, applicationId: 'invoice', commitSha: providerCommit, repositoryUrl: 'https://github.com/example/invoice', imageDigest: null };
+export const providerVersion = { ...sourceVersion, id: 'bb864dd4-218f-4eaf-9ef8-ec493bde6cd7', applicationId: 'invoice', commitSha: providerCommit, repositoryUrl: 'https://github.com/example/invoice', imageDigest: null };
 export const declaration = { id: providerPublicationId, consumerApplicationId: 'payments', providerApplicationId: 'invoice', registeredAt: date };
 export const consumerPublication = { id: publicationId, bindingId: providerPublicationId, sourceVersionId: versionId, artifactSha256: contractHash, kind: 'ConsumerPact', specificationVersion: '3', sourceApplicationId: 'payments', commitSha: consumerCommit, consumerApplicationId: 'payments', providerApplicationId: 'invoice', sourceRef: 'refs/heads/feature/a + b', buildUrl: 'https://ci.example.test/runs/123', publisherId: 'payments-ci', repositoryUrl: sourceVersion.repositoryUrl, publishedAt: date };
-export const providerPublication = { ...consumerPublication, id: providerPublicationId, artifactSha256: providerHash, kind: 'ProviderOpenApi', specificationVersion: '3.1.1', sourceApplicationId: 'invoice', commitSha: providerCommit, consumerApplicationId: null, repositoryUrl: providerVersion.repositoryUrl };
+export const providerPublication = { ...consumerPublication, id: providerPublicationId, sourceVersionId: providerVersion.id, artifactSha256: providerHash, kind: 'ProviderOpenApi', specificationVersion: '3.1.1', sourceApplicationId: 'invoice', commitSha: providerCommit, consumerApplicationId: null, repositoryUrl: providerVersion.repositoryUrl };
 
 export async function registryFixture(page: Page): Promise<string[]> {
   const requests: string[] = [];

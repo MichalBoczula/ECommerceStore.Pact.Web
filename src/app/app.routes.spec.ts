@@ -25,13 +25,13 @@ describe('Workspace routing', () => {
       await harness.navigateByUrl(`/${section.path}`);
       expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe(section.title);
       expect(TestBed.inject(Title).getTitle()).toBe(`${section.label} | Pact`);
-      if (!['applications', 'dependencies', 'contracts'].includes(section.path)) expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
+      if (!['applications', 'dependencies', 'contracts', 'verifications'].includes(section.path)) expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
     }
   });
 
   it('retains a bookmarked section and query when opened directly', async () => {
-    const harness = await RouterTestingHarness.create('/verifications?provider=invoice');
-    expect(TestBed.inject(Router).url).toBe('/verifications?provider=invoice');
+    const harness = await RouterTestingHarness.create('/verifications?providerApplicationId=invoice');
+    expect(TestBed.inject(Router).url).toBe('/verifications?providerApplicationId=invoice');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Verification evidence');
   });
 
