@@ -31,13 +31,15 @@ npm run verify
 ```
 
 `npm run verify` runs source/contract checks, a high/critical dependency audit, lint, production build,
-Vitest coverage and Playwright shell smoke tests. On Windows use Git Bash or WSL. The smoke suite
-starts Angular itself. Individual stages are available as `bash scripts/ci.sh source|contract|audit|build|unit|smoke`.
+Vitest coverage, controlled-HTTP browser smoke and real registry browser acceptance. The full run
+also requires .NET SDK 10 and Docker (or a configured native MongoDB 8.0 executable). On Windows use
+Git Bash or WSL. Individual stages are available as `bash scripts/ci.sh source|contract|audit|build|unit|smoke|registry`.
+See [isolated API/MongoDB acceptance](docs/registry-acceptance.md) for startup, isolation and reports.
 
 Unit JUnit output is `TestResults/unit.xml`; coverage is under `coverage/`. Browser reports,
 failure screenshots and traces are under `TestResults/`. CI runs on PRs targeting `main` and pushes
 to `main`, includes dependency review and secret scanning, and requires every mandatory job in
-`quality-gate`. This foundation does not publish images or deploy infrastructure.
+`quality-gate`, including the real registry acceptance job. This foundation does not publish images or deploy infrastructure.
 
 ## Architecture and design
 
@@ -76,5 +78,6 @@ the application, version, integration and publication explorer. WEB/05 adds veri
 and diagnostic details. WEB/06 adds stored contract comparisons and comparable issue history.
 WEB/07 adds stored explicit-version compatibility matrices and pinned profile browsing.
 WEB/08 adds global inventory, filtered report counts and a selectable, paged declaration graph.
-Next: WEB/09 adds real browser/API/MongoDB acceptance. Production Nginx/image delivery follows in WEB/10;
+WEB/09 adds isolated real browser/API/MongoDB acceptance as a mandatory CI job.
+Next: WEB/10 adds tested/scanned immutable image publication and production Nginx;
 CI remains responsible for publishing registry evidence.

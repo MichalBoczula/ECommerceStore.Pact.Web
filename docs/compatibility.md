@@ -62,5 +62,9 @@ existing Material controls, local fonts and theme tokens. The matrix is a named,
 native table; full row/check evidence uses native disclosure controls. Repository tests exercise
 the real generated Kiota client; state/use-case tests cover selection, cancellation and safe errors.
 Browser checks cover exact links/bookmarks, all outcomes/reasons, multirow snapshots, recovery,
-responsive layout and accessibility. Controlled HTTP fixtures are test-only data; real browser/API/
-MongoDB acceptance remains WEB/09, hosted source-CI evidence remains WEB/12.
+responsive layout and accessibility. Controlled HTTP fixtures are test-only data; hosted source-CI
+evidence remains WEB/12.
+
+WEB/09 now verifies the real browser/API/MongoDB path in the separate
+[isolated registry acceptance suite](registry-acceptance.md). Synthetic publications in that suite
+do not establish the source-CI pilot or hosted acceptance.

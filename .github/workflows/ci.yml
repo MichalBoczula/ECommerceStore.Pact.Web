@@ -97,9 +97,47 @@ jobs:
             TestResults/playwright-results/
           if-no-files-found: error
 
+  registry-acceptance:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select reviewed API source
+        id: api
+        run: |
+          node --input-type=module - <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const manifest = JSON.parse(readFileSync('contracts/upstream/manifest.json', 'utf8'));
+          if (!/^[a-f0-9]{40}$/.test(manifest.sourceCommit)) throw new Error('Invalid pinned API commit.');
+          appendFileSync(process.env.GITHUB_OUTPUT, `sha=${manifest.sourceCommit}\n`);
+          JS
+      - uses: actions/checkout@v4
+        with:
+          repository: MichalBoczula/ECommerceStore.Pact
+          ref: ${{ steps.api.outputs.sha }}
+          path: .tools/registry-api
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: npm install --global npm@11.5.2
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: bash scripts/ci.sh registry
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: registry-acceptance-reports
+          path: TestResults/registry/
+          if-no-files-found: error
+
   quality-gate:
     if: always()
-    needs: [build, unit-tests, browser-smoke, dependency-review, secret-scan]
+    needs: [build, unit-tests, browser-smoke, registry-acceptance, dependency-review, secret-scan]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -109,11 +147,12 @@ jobs:
           BUILD: ${{ needs.build.result }}
           UNIT: ${{ needs.unit-tests.result }}
           BROWSER: ${{ needs.browser-smoke.result }}
+          REGISTRY: ${{ needs.registry-acceptance.result }}
           DEPENDENCY: ${{ needs.dependency-review.result }}
           SECRETS: ${{ needs.secret-scan.result }}
         run: |
           set -euo pipefail
-          for job in BUILD UNIT BROWSER SECRETS; do
+          for job in BUILD UNIT BROWSER REGISTRY SECRETS; do
             if [[ "${!job}" != success ]]; then
               echo "$job must succeed; actual result: ${!job}" >&2
               exit 1
