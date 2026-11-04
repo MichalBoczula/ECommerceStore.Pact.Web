@@ -7,7 +7,8 @@ SCSS and NgRx patterns. `App` composes the shared workspace shell; feature pages
 The root redirects to overview. The shared section metadata supplies navigation, route data and
 titles. The registry explorer owns Applications, Dependencies and Contracts; verification evidence
 owns Verifications. History owns stored comparisons under Contracts and the Issue history destination.
-Overview and compatibility retain their existing empty states. Unknown addresses retain their URL and offer recovery.
+Compatibility owns stored decision matrices and pinned profiles. Overview retains its existing empty state.
+Unknown addresses retain their URL and offer recovery.
 
 The shell owns only navigation and responsive drawer behavior. Its viewport state uses Angular
 signals/CDK; it does not belong in the business store. NgRx is registered centrally, with DevTools
@@ -28,8 +29,8 @@ WEB/10. One Pact API does not require a new business BFF. Reviewed upstream Open
 Kiota 1.34.1 produce one committed GET-only client, loaded on the first repository read.
 Handwritten infrastructure repositories and mappers keep transport DTOs outside presentation and
 domain models. Domain-facing ports do not reference generated clients. Registry and verification
-reads and history now have concrete ports and providers; matrix and dashboard ports arrive
-with those features. Errors map from ProblemDetails into presentation-safe domain errors. See
+reads, history and compatibility now have concrete ports and providers; dashboard ports arrive
+in WEB/08. Errors map from ProblemDetails into presentation-safe domain errors. See
 [the contract and transport details](api-boundary.md).
 
 Presentation → facade → NgRx actions/effects/selectors → repository port → Kiota adapter → API.
@@ -81,6 +82,19 @@ API owns issue grouping/transitions; the mapper validates the supported policy a
 evidence without inventing transitions or upgrading negative decisions. Both run snapshots and
 nullable historical issue sides retain lossless diagnostics. See [history behavior](history.md).
 
+## Stored compatibility matrices (WEB/07)
+
+One lazy route group owns compatibility decision browsing/details and immutable profile browsing/details.
+Its facade, state, cancellable effects and repository reuse the anonymous GET-only boundary. List
+filters and cursor bookmarks remain URL-owned; direct IDs retrieve complete stored snapshots. No
+publisher endpoint or client-side evaluation is added.
+
+The API owns the explicit-CI-execution policy, selected rows, applicability reasons, outcomes and
+compatibility flag. Handwritten mapping validates bounds, complete pinned-profile check membership
+and positive-evidence consistency without upgrading negative evidence. Nullable observed-verifier
+metadata uses the same captured response to preserve null despite Kiota's union behavior. Native
+tables and disclosures retain full evidence and keyboard/mobile access. See [compatibility behavior](compatibility.md).
+
 ## Evidence rules
 
 - CI publishes registrations, artifacts, verification reports, comparison snapshots and decisions.
@@ -108,4 +122,4 @@ The build job also verifies the snapshot hash, infrastructure import boundary an
 regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated
 serialization is exercised by repository tests. WEB/10 will add build-once scanned-image publication.
 WEB/11 reuses the existing Terraform root/state and ACA environment. No image publishing, Terraform
-apply or cloud readiness is part of WEB/01-06.
+apply or cloud readiness is part of WEB/01-07.

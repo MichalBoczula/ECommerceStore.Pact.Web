@@ -1,0 +1,69 @@
+@let vm = view();
+<nav class="breadcrumbs" aria-label="Breadcrumb"><a routerLink="/overview">Overview</a><span>/</span>
+  @if (selection().kind !== 'decisions') { <a routerLink="/compatibility">Compatibility</a><span>/</span> }
+  <span>{{ title() }}</span>
+</nav>
+<header class="page-heading"><div><h1>{{ title() }}</h1><p>Stored decisions for exact versions, Pact hashes and CI executions. The registry owns the compatibility policy.</p></div><button mat-stroked-button type="button" (click)="facade.retry()">Refresh</button></header>
+@if (isList()) {
+  <form class="panel" [formGroup]="form" (ngSubmit)="apply()" aria-label="Compatibility filters">
+    <div class="filter-grid">@for (field of fields(); track field[0]) {
+      <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label>
+        @if (field[0] === 'status') { <mat-select formControlName="status"><mat-option value="">All statuses</mat-option>@for (status of ['Passed', 'Failed', 'Error', 'Unverified']; track status) { <mat-option [value]="status">{{ status }}</mat-option> }</mat-select> }
+        @else { <input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false" [attr.inputmode]="field[0] === 'limit' ? 'numeric' : null"> }
+      </mat-form-field>
+    }</div>
+    <div class="actions"><button mat-flat-button type="submit">Apply filters</button><button mat-button type="button" (click)="clear()">Clear filters</button>
+      @if (selection().kind === 'decisions') { <a mat-button routerLink="/compatibility/profiles">Browse pinned profiles</a> } @else { <a mat-button routerLink="/compatibility">Browse stored decisions</a> }
+    </div>
+    @if (selection().kind === 'decisions') { <p class="note">Version and hash filters must match the same stored matrix row. Opening a decision shows its complete snapshot.</p> }
+  </form>
+}
+@if (vm.status === 'loading') { <section class="panel" role="status" aria-live="polite">Loading stored compatibility records…</section> }
+@if (vm.error; as error) { <app-registry-error-panel [error]="error" (retry)="facade.retry()" /> }
+@if (vm.data; as data) {
+  @switch (data.kind) {
+    @case ('decisions') {
+      <section class="panel"><h2 id="decisions-title">Stored decision snapshots</h2>
+        @if (data.page.items.length) {
+          <div class="table-scroll" tabindex="0" role="region" aria-labelledby="decisions-title"><table><caption class="visually-hidden">Stored compatibility decisions</caption><thead><tr><th scope="col">Integration</th><th scope="col">Pinned profile</th><th scope="col">Outcome</th><th scope="col">Evidence</th></tr></thead><tbody>
+            @for (decision of data.page.items; track decision.id) { <tr><td><strong>{{ decision.consumerApplicationId }} → {{ decision.providerApplicationId }}</strong><p class="identity">{{ decision.id }}</p></td><td><a [routerLink]="['/compatibility/profiles', decision.profileId]">{{ decision.profileName }} / {{ decision.profileVersion }}</a><p class="identity">{{ decision.profileId }}</p></td><td><app-evidence-status [status]="decision.status" /><p>{{ decision.rowCount }} selected row(s)</p></td><td><p>{{ decision.evaluatedAt | date:'medium':'UTC' }} UTC</p><a mat-button [routerLink]="['/compatibility/decisions', decision.id]" [queryParams]="selection().query">Open stored decision</a></td></tr> }
+          </tbody></table></div>
+        } @else { <h3>No decisions found</h3><p>No stored compatibility decisions match these filters. Missing decisions do not establish compatibility.</p> }
+      </section>
+    }
+    @case ('profiles') {
+      @for (profile of data.page.items; track profile.id) { <article class="panel"><h2>{{ profile.name }} / {{ profile.version }}</h2><app-record-fields [fields]="profileFields(profile)" /><div class="actions"><a mat-button [routerLink]="['/compatibility/profiles', profile.id]" [queryParams]="selection().query">Open pinned profile</a><a mat-button routerLink="/compatibility" [queryParams]="{ profileId: profile.id }">Decisions using this profile</a></div></article> }
+      @empty { <section class="panel"><h2>No profiles found</h2><p>No registered verification profiles match these filters.</p></section> }
+    }
+    @case ('profile') {
+      <section class="panel"><h2>Immutable required-check profile</h2><app-record-fields [fields]="profileFields(data.profile)" /><div class="actions"><a mat-stroked-button routerLink="/compatibility" [queryParams]="{ profileId: data.profile.id }">Decisions using this profile</a><a mat-button routerLink="/compatibility/profiles" [queryParams]="selection().query">Back to profiles</a></div></section>
+      <section class="panel"><h2>Required checks</h2><p>Every configured check is required for each selected version and CI execution.</p>@for (check of data.profile.checks; track check.checkId) { <article class="check"><app-record-fields [fields]="checkFields(check)" /></article> }</section>
+    }
+    @case ('decision') {
+      <section class="panel decision-summary"><div class="result-heading"><h2>Recorded matrix outcome</h2><app-evidence-status [status]="data.decision.status" /></div><p class="compatibility-result">{{ data.decision.compatible ? 'Compatible for this exact stored matrix.' : 'Compatibility not established for this stored matrix.' }}</p><p class="note">Only complete Passed evidence for every required check and selected row establishes compatibility. This decision applies to its recorded selection.</p><app-record-fields [fields]="decisionFields(data.decision)" /><div class="actions"><a mat-button routerLink="/compatibility" [queryParams]="selection().query">Back to decisions</a></div></section>
+      <section class="panel"><h2>Pinned profile snapshot</h2><app-record-fields [fields]="profileFields(data.decision.profile)" /><div class="actions"><a mat-button [routerLink]="['/compatibility/profiles', data.decision.profile.id]">Open pinned profile</a></div></section>
+      <section class="panel"><h2 id="matrix-title">Exact version / CI matrix</h2><p class="note">{{ data.decision.rows.length }} recorded selection(s), bounded to 10. Full hashes and commits are available below.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="matrix-title"><table><caption class="visually-hidden">Exact consumer and provider selections</caption><thead><tr><th scope="col">Selection</th><th scope="col">Consumer commit</th><th scope="col">Provider commit</th><th scope="col">Selected CI</th><th scope="col">Outcome / gaps</th></tr></thead><tbody>
+          @for (row of data.decision.rows; track $index) { <tr><th scope="row">Row {{ $index + 1 }}</th><td><a class="identity" [routerLink]="['/applications', row.consumerApplicationId, 'versions', row.consumerCommitSha]">{{ row.consumerApplicationId }} · {{ row.consumerCommitSha }}</a></td><td><a class="identity" [routerLink]="['/applications', row.providerApplicationId, 'versions', row.providerCommitSha]">{{ row.providerApplicationId }} · {{ row.providerCommitSha }}</a></td><td class="identity">{{ row.ciRunId }} / attempt {{ row.ciAttempt }}</td><td><app-evidence-status [status]="row.status" /><p>Missing/inapplicable: {{ row.missingChecks.length }}<br>Unresolved: {{ row.unresolvedChecks.length }}</p></td></tr> }
+        </tbody></table></div>
+      </section>
+      @for (row of data.decision.rows; track $index) {
+        <details class="panel row-details" [open]="$index === 0"><summary>Row {{ $index + 1 }} · {{ row.status }} · required checks and evidence</summary>
+          <div class="row-body"><app-record-fields [fields]="rowFields(row)" /><p>Missing/inapplicable checks: <span class="identity">{{ row.missingChecks.join(', ') || 'None recorded' }}</span></p><p>Unresolved checks: <span class="identity">{{ row.unresolvedChecks.join(', ') || 'None recorded' }}</span></p>
+            @for (check of row.checks; track check.required.checkId) {
+              <article class="check"><div class="result-heading"><h3>{{ check.required.checkId }}</h3><app-evidence-status [status]="check.status" /></div><p><strong>{{ check.reason }}</strong> · {{ reasons[check.reason] }}</p><h4>Required verifier</h4><app-record-fields [fields]="checkFields(check.required)" />
+                @if (check.evidenceId) { <h4>Observed report</h4><p class="reported-status">Reported run status: @if (check.reportedStatus; as reported) { <app-evidence-status [status]="reported" /> }</p><p class="note">The reported run status is separate from whether this evidence satisfies the pinned check.</p>@if (check.observedVerifier; as observed) { <app-record-fields [fields]="checkFields(observed)" /> } }
+                <div class="evidence-fields"><app-record-fields [fields]="evidenceFields(check)" /></div><div class="actions">
+                  @if (check.evidenceId) { <a mat-stroked-button [routerLink]="['/verifications', check.evidenceId]">Open exact verification</a> }
+                  @if (check.observedPublicationId) { <a mat-button [routerLink]="['/contracts', check.observedPublicationId]">Open observed publication</a> }
+                  @if (webUrl(check.buildUrl); as href) { <a mat-button [href]="href" target="_blank" rel="noopener noreferrer">Open selected CI run</a> }
+                </div>
+              </article>
+            }
+          </div>
+        </details>
+      }
+    }
+  }
+}
+@if (page(); as page) { <nav class="pagination" aria-label="Compatibility pagination"><p>Showing {{ page.items.length }} record(s) on this page.</p><div class="actions"><button mat-stroked-button type="button" [disabled]="!selection().query['after']" (click)="facade.page(null)">First page</button><button mat-stroked-button type="button" [disabled]="!page.nextCursor" (click)="facade.page(page.nextCursor)">Next page</button></div></nav> }
