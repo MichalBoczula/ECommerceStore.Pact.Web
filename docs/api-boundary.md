@@ -63,11 +63,12 @@ isolated between concurrent requests. Effects can use `switchMap` for changing s
 | `RegistryRepository` | Application discovery, exact versions, directed integrations, publication discovery/details, artifact metadata and original content bytes |
 | `VerificationRepository` | Filtered paginated report discovery and exact run details |
 
-The generated client contains the remaining read endpoints too. History repository ports/models are implemented in WEB/06; profiles, compatibility matrices,
-overview and graph will be added with their feature tasks. No empty feature state/effect/facade is introduced. WEB/04 connects registry
-reads to Applications, Dependencies and Contracts; WEB/05 connects verification history and details.
-WEB/06 adds stored comparisons and explicit issue history. Overview and compatibility remain
-honest empty states until their feature tasks.
+History and compatibility ports are bound in their lazy feature composition roots. `HistoryRepository`
+reads stored comparisons and explicit issue history (WEB/06); `CompatibilityRepository` reads stored
+decisions and pinned profiles (WEB/07). The generated client already contains the overview/graph
+endpoints; their handwritten ports arrive in WEB/08. No empty feature state/effect/facade is introduced.
+WEB/04 connects registry reads to Applications, Dependencies and Contracts; WEB/05 connects verification
+history/details. Overview retains an honest empty state until WEB/08.
 
 ## Evidence and failures
 
@@ -85,6 +86,10 @@ become `{ present: false }` or `{ present: true, json: string }`, preserving omi
 null, false, zero, nested JSON and arbitrary numeric precision. `actualPresent` remains a separate
 API fact. Render diagnostic JSON, messages and validation text with Angular text interpolation,
 never `innerHTML`. Original artifacts return the untouched ArrayBuffer, never reserialized JSON.
+Stored decisions use the same captured-response path for nullable observed-verifier metadata:
+Kiota's nullable union does not preserve the difference between a null verifier and its empty union
+member. The handwritten adapter preserves that value without changing generated code. See
+[compatibility mapping and policy validation](compatibility.md).
 
 ProblemDetails map to validation (400/422), not-found (404), unavailable (502/503/504) or service
 errors, using the HTTP status rather than a conflicting body status. Field validation arrays and

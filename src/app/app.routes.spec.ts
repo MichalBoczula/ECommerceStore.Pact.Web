@@ -25,7 +25,7 @@ describe('Workspace routing', () => {
       await harness.navigateByUrl(`/${section.path}`);
       expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe(section.title);
       expect(TestBed.inject(Title).getTitle()).toBe(`${section.label} | Pact`);
-      if (!['applications', 'dependencies', 'contracts', 'verifications', 'issue-history'].includes(section.path)) expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
+      if (!['applications', 'dependencies', 'contracts', 'verifications', 'issue-history', 'compatibility'].includes(section.path)) expect(harness.routeNativeElement?.textContent).toContain(section.emptyTitle);
     }
   });
 
