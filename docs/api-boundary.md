@@ -44,10 +44,11 @@ To update a contract:
 
 ## Transport and repository scope
 
-Browser → `/backend/api/...` → Angular dev proxy → Pact `/api/...`. The local target defaults to
-`http://127.0.0.1:5080`; `PACT_API_URL` changes only the development server's proxy target.
-Production must implement the same prefix removal and preserve `/api`, query encoding and original
-response bytes in WEB/10. No Nginx/container/Azure deployment is delivered by WEB/03.
+Browser → `/backend/api/...` → Angular dev proxy or production Nginx → Pact `/api/...`.
+The development target defaults to `http://127.0.0.1:5080`; `PACT_API_URL` changes the server-side
+proxy target. WEB/10 adds production Nginx with explicit origin validation, the same prefix removal,
+query encoding/original-byte preservation, GET-only forwarding and stripped credentials/cookies.
+See [image delivery](image-delivery.md). Azure deployment remains WEB/11–12.
 
 The transport permits only GET at the current origin under `/backend/api/`. It uses anonymous
 authentication, omits cookies, refuses credential headers, disables redirects and caching, and

@@ -4,6 +4,7 @@
 /out-tsc/
 /coverage/
 /TestResults/
+/artifacts/
 /.tools/
 *.log
 .env
