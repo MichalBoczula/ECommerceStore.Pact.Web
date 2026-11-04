@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-case "${1:?Usage: scripts/ci.sh source|contract|audit|build|unit|smoke}" in
+case "${1:?Usage: scripts/ci.sh source|contract|audit|build|unit|smoke|registry}" in
   source)
     git diff --check
     for script in scripts/*.sh; do bash -n "$script"; done
@@ -19,5 +19,6 @@ case "${1:?Usage: scripts/ci.sh source|contract|audit|build|unit|smoke}" in
     ;;
   unit) npm run test:coverage ;;
   smoke) npm run test:smoke ;;
+  registry) npm run test:registry ;;
   *) echo 'Unknown verification stage.' >&2; exit 2 ;;
 esac

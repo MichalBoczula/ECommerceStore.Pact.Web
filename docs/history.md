@@ -75,4 +75,8 @@ distinct. Existing quality gates, generated-client drift checks and anonymous GE
 Tests use the actual generated client and controlled HTTP responses to cover nullable sides, precise
 values, every transition, unsafe positive projections, query/cursor scope, cancellation, errors,
 provenance navigation, mobile layout and axe accessibility. These do not establish live API/MongoDB
-or hosted source-CI acceptance (WEB/09 and WEB/12). Image/Nginx and Terraform remain WEB/10-11.
+or hosted source-CI acceptance on their own. Hosted evidence remains WEB/12; image/Nginx and Terraform remain WEB/10-11.
+
+WEB/09 now verifies the real browser/API/MongoDB path in the separate
+[isolated registry acceptance suite](registry-acceptance.md). Synthetic publications in that suite
+do not establish the source-CI pilot or hosted acceptance.

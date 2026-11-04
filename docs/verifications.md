@@ -81,5 +81,9 @@ all four statuses, bookmarks, paging, diagnostics/precision, safe rendering, lin
 failure states and responsive accessibility. Fixtures stay outside application assets. Desktop and
 mobile screenshots are inspected against the approved concepts.
 
-These checks do not establish live browser/API/MongoDB or hosted/source-CI acceptance. Those remain
-WEB/09 and WEB/12. Container publication, production Nginx and Terraform remain WEB/10-11.
+These controlled-response checks alone do not establish real registry or hosted/source-CI acceptance.
+Hosted evidence remains WEB/12. Container publication, production Nginx and Terraform remain WEB/10-11.
+
+WEB/09 now verifies the real browser/API/MongoDB path in the separate
+[isolated registry acceptance suite](registry-acceptance.md). Synthetic publications in that suite
+do not establish the source-CI pilot or hosted acceptance.

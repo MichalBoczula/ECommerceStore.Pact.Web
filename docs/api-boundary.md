@@ -101,5 +101,8 @@ does not become an empty registry, a zero count or a passing result.
 Repository tests execute the real generated client against controlled fetch responses, including
 serialization, encoding, binary content, errors, cancellation and concurrent diagnostics. Browser
 smoke verifies the actual Angular proxy against a local HTTP fixture and covers shell accessibility
-and navigation. These fixtures do not establish live registry, MongoDB or hosted acceptance; those
-remain WEB/09 and WEB/12.
+and navigation. These controlled-response fixtures do not establish real registry or hosted acceptance by themselves.
+
+WEB/09 now verifies the real browser/API/MongoDB path in the separate
+[isolated registry acceptance suite](registry-acceptance.md). Synthetic publications in that suite
+do not establish the source-CI pilot or hosted acceptance.

@@ -16,6 +16,7 @@
     "test:watch": "ng test --watch",
     "test:coverage": "ng test --watch=false --coverage",
     "test:smoke": "playwright test",
+    "test:registry": "node scripts/registry-acceptance.mjs",
     "verify": "bash scripts/verify.sh",
     "api:generate": "bash scripts/generate-api-client.sh",
     "api:check": "node scripts/check-client-drift.mjs"

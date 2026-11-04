@@ -130,7 +130,14 @@ behavior. Playwright smoke covers the rendered shell, active navigation, mobile/
 keyboard skip navigation, local fonts and axe accessibility. These are UI foundation checks; real
 registry/container acceptance belongs to WEB/09 and source-CI/hosted acceptance to WEB/12.
 
-CI on `main`/PRs runs source checks, audit, lint/build, coverage, browser smoke, dependency review and
+WEB/09 adds real browser acceptance against a clean API checkout pinned to the reviewed OpenAPI
+source and an isolated MongoDB. Setup publishes synthetic data through authenticated API endpoints;
+the browser performs anonymous GETs through the Angular proxy without request interception.
+Failure/fix history, immutable missing-check snapshots, four statuses, original bytes, lossless
+diagnostics, mobile/keyboard/axe and actual unavailable-database responses are exercised. Processes
+and data are owned by the harness. See [registry acceptance](registry-acceptance.md).
+
+CI on `main`/PRs runs source checks, audit, lint/build, coverage, browser smoke, real registry acceptance, dependency review and
 gitleaks. `quality-gate` fails when a mandatory dependency fails, is cancelled or unexpectedly skipped.
 The build job also verifies the snapshot hash, infrastructure import boundary and deterministic
 regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated

@@ -64,5 +64,9 @@ the pinned OpenAPI remain unchanged; `errorEscaped` maps explicitly to the API's
 Tests execute real generated-client requests against controlled HTTP responses and cover filtering,
 query encoding, nullable selections, four counts, empty/unavailable/malformed states, bounds,
 pagination, partial errors, cancellation, cycles, exact drill-down, keyboard and responsive/axe checks.
-These fixtures are not live source-CI evidence. Real browser/API/MongoDB acceptance is WEB/09;
-image/Nginx, existing Terraform root/state and hosted acceptance remain WEB/10–12.
+These fixtures are not live source-CI evidence. Image/Nginx, existing Terraform root/state and
+hosted acceptance remain WEB/10–12.
+
+WEB/09 now verifies the real browser/API/MongoDB path in the separate
+[isolated registry acceptance suite](registry-acceptance.md). Synthetic publications in that suite
+do not establish the source-CI pilot or hosted acceptance.
