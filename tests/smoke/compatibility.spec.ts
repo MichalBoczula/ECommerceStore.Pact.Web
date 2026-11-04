@@ -19,7 +19,11 @@ test('decision filters, cursor bookmarks and exact detail selection survive navi
   await expect(page.getByText('explicit-ci-execution-v1', { exact: true })).toBeVisible(); await expect(page.getByText(`${ciRunId} / 2`, { exact: true })).toBeVisible();
   await expect(page.getByText(contractHash, { exact: true })).toBeVisible(); await expect(page.getByRole('link', { name: `payments · ${consumerCommit}`, exact: true })).toHaveAttribute('href', `/applications/payments/versions/${consumerCommit}`);
   await expect(page.getByRole('link', { name: 'Open exact verification', exact: true }).last()).toHaveAttribute('href', `/verifications/${passedRunId}`);
-  await page.getByRole('link', { name: 'Open exact verification', exact: true }).last().click(); await expect(page.getByRole('heading', { name: 'Verification details', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Open exact verification', exact: true }).last().click();
+  await expect(page).toHaveURL(new RegExp(`/verifications/${passedRunId}$`));
+  await expect(page.getByRole('heading', { name: 'payments → invoice', exact: true })).toBeVisible();
+  await expect(page.getByText(`Verification ${passedRunId}`, { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Recorded verification result' })).toContainText('Passed');
   expect(requests.filter(url => new URL(url).pathname.startsWith('/backend/api/compatibility-decisions/')).length).toBeGreaterThan(0);
 });
 
@@ -28,7 +32,10 @@ test('profile discovery pins name, version and content before browsing decisions
   await page.getByRole('button', { name: 'Next page', exact: true }).click(); expect(new URL(page.url()).searchParams.get('after')).toBe(profileCursor);
   await page.getByLabel('Profile name', { exact: true }).fill(profile.name); await page.getByLabel('Profile version', { exact: true }).fill(profile.version); await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Open pinned profile', exact: true })).toBeVisible(); expect(new URL(page.url()).searchParams.has('after')).toBe(false);
-  await page.getByRole('link', { name: 'Open pinned profile', exact: true }).click(); await page.reload(); await expect(page.getByText(profile.contentSha256, { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Open pinned profile', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/compatibility/profiles/${profileId}\\?`));
+  await expect(page.getByRole('heading', { name: 'Verification profile', exact: true })).toBeVisible();
+  await page.reload(); await expect(page.getByText(profile.contentSha256, { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Required checks', exact: true })).toBeVisible(); await expect(page.locator('.check')).toHaveCount(2);
   await page.getByRole('link', { name: 'Decisions using this profile', exact: true }).click(); await expect(page.getByLabel('Profile ID', { exact: true })).toHaveValue(profileId);
 });
