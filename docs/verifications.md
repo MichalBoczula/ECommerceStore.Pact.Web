@@ -36,8 +36,8 @@ is separate from a compatibility decision.
 The detail view adapts the approved Figma desktop/mobile verification layout: outcome summary,
 consumer/provider/CI cards, expected/actual panels and evidence actions. Real records retain full
 identities and expand naturally rather than clipping content to the design's illustrative text.
-Comparable issue transitions are intentionally left for WEB/06; no sample failing/fixed timeline
-is presented as registry evidence.
+WEB/06 now provides comparable issue transitions through an explicit before/after selection.
+No sample failing/fixed timeline is presented as registry evidence.
 
 Commit SHAs, Pact hash, run/attempt/check IDs and source links remain available in full. CI run IDs
 stay strings, including values larger than JavaScript's safe integer range. Full report provenance
@@ -57,6 +57,9 @@ HTTP(S) provenance links reuse the shared safe link handling. Other schemes rema
 The consumer publication button targets the report's exact publication ID. Download consumer Pact
 uses the report's pinned consumer hash, saves unchanged bytes through the shared browser adapter,
 and reports a failed download without claiming success. It never reserializes a JSON artifact.
+
+Use as baseline for issue history opens `/issue-history` with the exact current report ID and its
+provider source ref. The candidate must still be selected explicitly.
 
 The explorer links declarations to consumer/provider history and retains a selected source commit
 in its matching role without pinning the other application's version. A consumer Pact publication scopes

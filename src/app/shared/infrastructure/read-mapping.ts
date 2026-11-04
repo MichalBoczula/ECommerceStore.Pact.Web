@@ -14,6 +14,10 @@ export function optionalText(value: unknown): string | null {
   return value == null ? null : text(value);
 }
 
+export function boolean(value: unknown): boolean {
+  return typeof value === 'boolean' ? value : invalidResponse();
+}
+
 export function timestamp(value: Date | null | undefined): string {
   return value instanceof Date && Number.isFinite(value.getTime()) ? value.toISOString() : invalidResponse();
 }

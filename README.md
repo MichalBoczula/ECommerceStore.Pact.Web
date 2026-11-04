@@ -1,9 +1,9 @@
 # ECommerceStore.Pact.Web
 
 Angular SPA for the ECommerceStore Pact contract registry. The Angular shell and anonymous API
-read boundary, registry explorer and verification history/details are implemented. Applications,
-Dependencies, Contracts and Verifications read the registry; overview, compatibility and issue
-history retain intentional empty states. No sample results are shown as live evidence.
+read boundary, registry explorer, verification details, stored comparisons and comparable issue
+history are implemented. Overview and compatibility retain intentional empty states. Issue history
+reads the registry only after an explicit before/after selection. No sample results are shown as live evidence.
 
 ## Run locally
 
@@ -45,12 +45,13 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 - NgRx root registration and development-only DevTools; feature stores/effects/facades arrive
   with their screens. The registry explorer and verification evidence have facades, feature state
   and cancellable effects.
-  Registry and verification repository ports expose handwritten read models;
+  Registry, verification and history repository ports expose handwritten read models;
   generated Kiota DTOs stay in infrastructure.
 - Seven navigation destinations, responsive Material drawer, active-link semantics, skip link,
   document titles, and a not-found route. The explorer adds cursor pagination, bookmarkable filters,
   full provenance and original-byte artifact downloads. Verification views add exact evidence filters,
-  four distinct statuses and lossless expected/actual diagnostics. Browser smoke covers accessibility.
+  four distinct statuses and lossless expected/actual diagnostics. Stored comparison findings and
+  API-projected issue transitions remain separate from compatibility decisions. Browser smoke covers accessibility.
 - Roboto and Material Icons are served locally with licenses; no Google Fonts request is required.
 - Distinct theme tokens reserve Passed, Failed, Error and Unverified without assigning statuses
   to records that have no verification evidence.
@@ -60,8 +61,8 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 
 The explorer extends the approved shell, cards, typography and Material control patterns.
 See [explorer routes and evidence scope](docs/explorer.md) and [verification history and details](docs/verifications.md).
-Dashboard graphs, summary counts, contract comparisons and comparable issue timelines follow in
-their backlog items.
+See [stored comparisons and comparable issue history](docs/history.md). Dashboard graphs, summary
+counts and explicit-version compatibility matrices follow in their backlog items.
 
 ## Related repositories
 
@@ -71,5 +72,6 @@ their backlog items.
 
 WEB/02 is merged in the API; WEB/03 pins its OpenAPI and adds the read boundary. WEB/04 implements
 the application, version, integration and publication explorer. WEB/05 adds verification history
-and diagnostic details. Next: WEB/06 adds stored contract comparisons and comparable issue history. Production Nginx/image delivery follows in WEB/10;
+and diagnostic details. WEB/06 adds stored contract comparisons and comparable issue history.
+Next: WEB/07 adds explicit-version compatibility matrices. Production Nginx/image delivery follows in WEB/10;
 CI remains responsible for publishing registry evidence.

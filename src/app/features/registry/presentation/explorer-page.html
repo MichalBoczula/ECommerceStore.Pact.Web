@@ -16,7 +16,8 @@
       @case ('version') { {{ params()['applicationId'] }} · {{ params()['commitSha'] }} }
       @case ('integrations') { Directed consumer and provider declarations. A declaration does not establish passing evidence. }
       @case ('integration') { {{ params()['consumerApplicationId'] }} → {{ params()['providerApplicationId'] }} }
-      @case ('publications') { Immutable artifacts with exact source versions and publication provenance. }
+      @case ('publications') {
+      <div class="actions section-actions"><a mat-stroked-button routerLink="/contracts/comparisons">Stored contract comparisons</a></div> Immutable artifacts with exact source versions and publication provenance. }
       @case ('publication') { {{ params()['id'] }} }
     }</p>
   </div>
@@ -91,6 +92,7 @@
       </section>
     }
     @case ('publications') {
+      <div class="actions section-actions"><a mat-stroked-button routerLink="/contracts/comparisons">Stored contract comparisons</a></div>
       <section class="record-list" aria-label="Contract publications">
         @for (publication of data.page.items; track publication.id) {
           <article class="panel record-card"><span class="kind-label">{{ publication.kind }}</span><h2><a [routerLink]="['/contracts', publication.id]" [queryParams]="selection().query">@if (publication.consumerApplicationId) { {{ publication.consumerApplicationId }} → {{ publication.providerApplicationId }} } @else { {{ publication.providerApplicationId }} / provider schema }</a></h2>
