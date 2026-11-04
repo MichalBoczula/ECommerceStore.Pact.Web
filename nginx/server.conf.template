@@ -36,6 +36,7 @@ server {
         proxy_redirect off;
     }
     location = /backend { return 404; }
+    location = /backend/api { return 404; }
     location ^~ /backend/ { return 404; }
     location = /api { return 404; }
     location ^~ /api/ { return 404; }

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import re
 from urllib.error import HTTPError
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--url", required=True)
@@ -13,9 +13,17 @@ args = parser.parse_args()
 checks = []
 
 
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+opener = build_opener(NoRedirect())
+
+
 def call(path, method="GET", headers=None):
     try:
-        response = urlopen(Request(args.url + path, method=method, headers=headers or {}), timeout=15)
+        response = opener.open(Request(args.url + path, method=method, headers=headers or {}), timeout=15)
     except HTTPError as error:
         response = error
     with response:
