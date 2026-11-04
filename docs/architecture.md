@@ -7,7 +7,8 @@ SCSS and NgRx patterns. `App` composes the shared workspace shell; feature pages
 The root redirects to overview. The shared section metadata supplies navigation, route data and
 titles. The registry explorer owns Applications, Dependencies and Contracts; verification evidence
 owns Verifications. History owns stored comparisons under Contracts and the Issue history destination.
-Compatibility owns stored decision matrices and pinned profiles. Overview retains its existing empty state.
+Compatibility owns stored decision matrices and pinned profiles. Overview owns inventory, filtered
+report counts, the directed dependency graph and recent matching evidence.
 Unknown addresses retain their URL and offer recovery.
 
 The shell owns only navigation and responsive drawer behavior. Its viewport state uses Angular
@@ -29,8 +30,8 @@ WEB/10. One Pact API does not require a new business BFF. Reviewed upstream Open
 Kiota 1.34.1 produce one committed GET-only client, loaded on the first repository read.
 Handwritten infrastructure repositories and mappers keep transport DTOs outside presentation and
 domain models. Domain-facing ports do not reference generated clients. Registry and verification
-reads, history and compatibility now have concrete ports and providers; dashboard ports arrive
-in WEB/08. Errors map from ProblemDetails into presentation-safe domain errors. See
+reads, history, compatibility and overview have concrete ports and providers.
+Errors map from ProblemDetails into presentation-safe domain errors. See
 [the contract and transport details](api-boundary.md).
 
 Presentation → facade → NgRx actions/effects/selectors → repository port → Kiota adapter → API.
@@ -95,6 +96,19 @@ and positive-evidence consistency without upgrading negative evidence. Nullable 
 metadata uses the same captured response to preserve null despite Kiota's union behavior. Native
 tables and disclosures retain full evidence and keyboard/mobile access. See [compatibility behavior](compatibility.md).
 
+## Registry overview and dependency graph (WEB/08)
+
+The overview is a lazy route with a facade, serializable state, cancellable effects and repository.
+Three concurrent reads separate global inventory/filtered counts, one declaration graph page and
+five recent report summaries. Each section has an independent safe failure state. API selection
+echoes are checked, graph cursors stay out of the counts/report preview, and failed/new selections
+never retain stale evidence. The shell itself makes no registry reads.
+
+Graph geometry is presentation-only and preserves directed declarations, cycles and disconnected
+components. Arrow/list selection is local UI state; it does not choose a run or compatibility result.
+Full selected evidence filters survive drill-down; partial pages and zero matching reports are
+explicit. See [overview behavior and accessible graph semantics](overview.md).
+
 ## Evidence rules
 
 - CI publishes registrations, artifacts, verification reports, comparison snapshots and decisions.
@@ -106,8 +120,8 @@ tables and disclosures retain full evidence and keyboard/mobile access. See [com
 - Issue resolution follows comparable requirements and a passing candidate, not requirement removal.
 - Graph edges are declared/tested dependencies, not observed runtime traces or a business sequence.
 - Render diagnostics as text and distinguish absent values from JSON null. Keep design fixtures out
-  of live-data presentation. The shell and overview make no registry calls; explorer and verification views read registered
-  records without fixtures.
+  of live-data presentation. Feature views read registered records/projections without bundled fixtures;
+  the shell owns navigation and responsive behavior only.
 
 ## Verification and delivery
 
@@ -122,4 +136,4 @@ The build job also verifies the snapshot hash, infrastructure import boundary an
 regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated
 serialization is exercised by repository tests. WEB/10 will add build-once scanned-image publication.
 WEB/11 reuses the existing Terraform root/state and ACA environment. No image publishing, Terraform
-apply or cloud readiness is part of WEB/01-07.
+apply or cloud readiness is part of WEB/01-08.

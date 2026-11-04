@@ -24,7 +24,7 @@ for (const entry of readdirSync('src/app', { recursive: true, withFileTypes: tru
   const path = join(entry.parentPath, entry.name);
   const source = readFileSync(path, 'utf8');
   if (path.startsWith(generated)) assert.doesNotMatch(source, /^\s+(post|put|patch|delete):\s*\{/m, 'Generated browser client must be read-only');
-  else if (!path.includes('/infrastructure/') && !['src/app/app.config.ts', 'src/app/features/registry/registry.routes.ts', 'src/app/features/verifications/verification.routes.ts', 'src/app/features/history/history.routes.ts', 'src/app/features/compatibility/compatibility.routes.ts'].includes(path)) {
+  else if (!path.includes('/infrastructure/') && !['src/app/app.config.ts', 'src/app/features/registry/registry.routes.ts', 'src/app/features/verifications/verification.routes.ts', 'src/app/features/history/history.routes.ts', 'src/app/features/compatibility/compatibility.routes.ts', 'src/app/features/overview/overview.routes.ts'].includes(path)) {
     assert.doesNotMatch(source, /from\s+['"][^'"]*(?:api-clients|kiota|infrastructure\/)/, `${path} must not import transport infrastructure`);
   }
 }

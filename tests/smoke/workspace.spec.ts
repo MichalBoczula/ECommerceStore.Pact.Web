@@ -1,8 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { overviewFixture } from '../fixtures/overview';
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/backend/api/**', route => route.fulfill({ json: { items: [], nextCursor: null } }));
+  await overviewFixture(page, true);
 });
 
 test('desktop navigation opens every section and marks the active link', async ({ page }) => {
@@ -57,21 +59,22 @@ test('mobile drawer supports keyboard navigation, closes, and restores the deskt
   await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible();
 });
 
-test('the overview uses local fonts, no backend evidence, and passes accessibility checks', async ({ page }) => {
+test('the overview uses local fonts, requests only its read projections, and passes accessibility checks', async ({ page }) => {
   const externalRequests: string[] = [];
   const apiRequests: string[] = [];
   const explorerRequests: string[] = [];
   page.on('request', (request) => {
     if (!request.url().startsWith('http://127.0.0.1:4200/')) externalRequests.push(request.url());
     if (new URL(request.url()).pathname.startsWith('/backend/')) apiRequests.push(request.url());
-    if (new URL(request.url()).pathname.includes('/features/registry/')) explorerRequests.push(request.url());
+    if (new URL(request.url()).pathname.includes('/presentation/explorer-page')) explorerRequests.push(request.url());
   });
   await page.goto('/overview');
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.getByText('No registry data loaded', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'No declared dependencies found', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'No matching verification reports', exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.fonts.check('14px Roboto'))).toBe(true);
   expect(externalRequests).toEqual([]);
-  expect(apiRequests).toEqual([]);
+  expect(apiRequests.map(url => new URL(url).pathname).sort()).toEqual(['/backend/api/reports/dependencies', '/backend/api/reports/overview', '/backend/api/reports/verification-runs']);
   expect(explorerRequests).toEqual([]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.keyboard.press('Tab');
