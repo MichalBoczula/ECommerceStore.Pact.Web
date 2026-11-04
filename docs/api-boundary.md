@@ -65,10 +65,11 @@ isolated between concurrent requests. Effects can use `switchMap` for changing s
 
 History and compatibility ports are bound in their lazy feature composition roots. `HistoryRepository`
 reads stored comparisons and explicit issue history (WEB/06); `CompatibilityRepository` reads stored
-decisions and pinned profiles (WEB/07). The generated client already contains the overview/graph
-endpoints; their handwritten ports arrive in WEB/08. No empty feature state/effect/facade is introduced.
+decisions and pinned profiles (WEB/07). `OverviewRepository` binds global inventory/filtered report
+counts and paged dependency projections in WEB/08; recent evidence reuses `VerificationRepository`.
+No empty feature state/effect/facade is introduced.
 WEB/04 connects registry reads to Applications, Dependencies and Contracts; WEB/05 connects verification
-history/details. Overview retains an honest empty state until WEB/08.
+history/details. The overview connects real read projections while preserving independent empty/error states.
 
 ## Evidence and failures
 

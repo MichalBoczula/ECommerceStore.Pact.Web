@@ -1,27 +1,48 @@
-<header class="page-heading">
-  <h1>Contract overview</h1>
-  <p>Understand dependencies. Follow each result back to exact evidence.</p>
-</header>
-<section class="welcome-card" aria-labelledby="welcome-title">
-  <span class="eyebrow">ECOMMERCESTORE / CONTRACT INTELLIGENCE</span>
-  <h2 id="welcome-title">Your contract workspace starts here</h2>
-  <p class="welcome-description">Explore application dependencies, inspect verification evidence, and understand compatibility across exact versions.</p>
-  <div class="welcome-actions">
-    <a mat-flat-button routerLink="/applications">Explore applications</a>
-    <a mat-stroked-button routerLink="/dependencies">View dependencies</a>
-  </div>
-  <div class="connection-note">
-    <strong>No registry data loaded</strong>
-    <p>Applications and contract evidence will appear here when registry browsing is connected.</p>
-  </div>
-</section>
-<section class="area-grid" aria-label="Explore the registry">
-  @for (area of areas; track area.path) {
-    <article class="area-card">
-      <h2>{{ area.title }}</h2>
-      <p>{{ area.description }}</p>
-      <a mat-button [routerLink]="area.path">{{ area.label }}</a>
-    </article>
+@let vm = view();
+<header class="page-heading"><div><h1>Contract overview</h1><p>Understand declared dependencies. Follow recorded evidence back to exact versions and CI executions.</p></div><button mat-stroked-button type="button" [disabled]="vm.status === 'loading'" (click)="facade.retry()">Refresh</button></header>
+<form class="panel filters" [formGroup]="form" (ngSubmit)="apply()" aria-label="Overview evidence filters"><div class="filter-grid">
+  @for (field of primary; track field[0]) { <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label><input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false"></mat-form-field> }
+  <mat-form-field appearance="outline"><mat-label>Recorded status</mat-label><mat-select formControlName="status"><mat-option value="">All statuses</mat-option>@for (status of statuses; track status) { <mat-option [value]="status">{{ status }}</mat-option> }</mat-select></mat-form-field>
+  <mat-form-field appearance="outline"><mat-label>Graph page size</mat-label><input matInput formControlName="limit" inputmode="numeric"></mat-form-field>
+</div><details class="advanced" [open]="advancedOpen()"><summary>Exact version and CI selection</summary><div class="filter-grid">@for (field of advanced; track field[0]) { <mat-form-field appearance="outline"><mat-label>{{ field[1] }}</mat-label><input matInput [formControlName]="field[0]" autocomplete="off" spellcheck="false" [attr.inputmode]="field[0] === 'ciAttempt' ? 'numeric' : null"></mat-form-field> }</div></details>
+  <div class="actions"><button mat-flat-button type="submit">Apply filters</button><button mat-button type="button" (click)="clear()">Clear filters</button></div>
+</form>
+@if (vm.status === 'loading') { <section class="panel" role="status" aria-live="polite">Loading registry overview…</section> }
+@if (vm.error; as error) { <app-registry-error-panel [error]="error" (retry)="facade.retry()" /> }
+@if (vm.data; as data) {
+  @if (data.overview.error; as error) { <section aria-label="Inventory and report counts unavailable"><app-registry-error-panel [error]="error" (retry)="facade.retry()" /></section> }
+  @if (data.overview.data; as overview) {
+    <section class="metrics" aria-label="Inventory and matching report metrics">
+      <article class="metric"><h2>Applications</h2><strong>{{ overview.inventory.registeredApplications }}</strong><span>Global inventory</span></article>
+      <article class="metric"><h2>Declared dependencies</h2><strong>{{ overview.inventory.declaredIntegrations }}</strong><span>Global inventory</span></article>
+      <article class="metric"><h2>Failed reports</h2><strong>{{ overview.matchingReports.failed }}</strong><span>Matching evidence selection</span></article>
+      <article class="metric"><h2>Unverified reports</h2><strong>{{ overview.matchingReports.unverified }}</strong><span>Matching evidence selection</span></article>
+    </section>
+    <section class="panel"><h2>Recorded report counts</h2><p>{{ overview.matchingReports.total }} matching report(s). These counts include recorded executions and reruns; they are not compatibility outcomes or counts of missing checks.</p><app-report-counts [counts]="overview.matchingReports" /><p class="note">Observed {{ overview.observedAt | date:'medium':'UTC' }} UTC. Global inventory is independent of the evidence filters. Reads are not a transactional snapshot.</p><details><summary>More global inventory counts</summary><div class="details-body"><app-record-fields [fields]="inventory(overview.inventory)" /></div></details><div class="actions"><a mat-button routerLink="/verifications" [queryParams]="evidenceQuery(overview.selection)">Browse matching verifications</a><a mat-button routerLink="/compatibility">Browse stored compatibility decisions</a></div></section>
   }
-</section>
-<p class="evidence-note">A published contract is not a passing verification. Compatibility depends on complete evidence for the selected versions.</p>
+  @if (data.graph.error; as error) { <section aria-label="Dependency graph unavailable"><app-registry-error-panel [error]="error" (retry)="facade.retry()" /></section> }
+  @if (data.graph.data; as graph) {
+    <section class="panel graph-panel"><h2>Application dependencies</h2><p class="note">Consumer → provider declarations and recorded evidence. Arrows do not represent runtime traces, execution order or compatibility.</p>
+      <p class="scope-note">{{ graph.isComplete ? 'Complete graph for these application filters.' : 'Partial graph page; other declared edges may be outside this page.' }} Evidence filters change report counts, not which relationships are declared.</p>
+      @if (graph.edges.length) {
+        <div class="graph-grid"><div><app-dependency-topology [graph]="graph" [selectedId]="selectedId()" (selected)="selectedId.set($event)" /><p class="note">Select an arrow or use the dependency list below. Dashed arrows have no matching reports.</p></div>
+          <aside class="selected-dependency" aria-label="Selected dependency" aria-live="polite">
+            @if (selectedEdge(); as edge) { <span class="eyebrow">SELECTED INTEGRATION · DECLARED</span><h3>{{ edge.integration.consumerApplicationId }} → {{ edge.integration.providerApplicationId }}</h3><p>{{ edge.matchingReports.total ? edge.matchingReports.total + ' matching recorded report(s).' : 'No matching reports. This declaration has no evidence for the current selection.' }}</p><app-report-counts [counts]="edge.matchingReports" /><div class="actions"><a mat-stroked-button routerLink="/verifications" [queryParams]="edgeQuery(graph.selection, edge)">View matching verifications</a><a mat-button [routerLink]="['/dependencies', edge.integration.consumerApplicationId, edge.integration.providerApplicationId]">Open declared integration</a></div> }
+            @else { <h3>Select a dependency</h3><p>Inspect its report counts and open the exact evidence selection.</p> }
+          </aside>
+        </div>
+        <h3 id="dependency-list-title">Dependency list</h3><ul class="dependency-list" aria-labelledby="dependency-list-title">@for (edge of graph.edges; track edge.integration.id) { <li [class.selected]="edge.integration.id === selectedId()"><div><button mat-button type="button" [attr.aria-pressed]="edge.integration.id === selectedId()" (click)="selectedId.set(edge.integration.id)">{{ edge.integration.consumerApplicationId }} → {{ edge.integration.providerApplicationId }}</button><p>Declared · {{ edge.matchingReports.total }} matching report(s){{ edge.matchingReports.total === 0 ? ' · no matching evidence' : '' }}</p></div><a mat-button routerLink="/verifications" [queryParams]="edgeQuery(graph.selection, edge)" [attr.aria-label]="'Verification evidence for ' + edge.integration.consumerApplicationId + ' to ' + edge.integration.providerApplicationId">Verification evidence</a></li> }</ul>
+      } @else { <h3>No declared dependencies found</h3><p>No declared integrations match the application filters on this graph page. Missing declarations or reports do not establish compatibility.</p> }
+      <nav class="pagination" aria-label="Dependency graph pagination"><p>{{ graph.edges.length }} declared edge(s) on this page.</p><div class="actions"><button mat-stroked-button type="button" [disabled]="!selection().query['after']" (click)="facade.page(null)">First graph page</button><button mat-stroked-button type="button" [disabled]="!graph.nextCursor" (click)="facade.page(graph.nextCursor)">Next graph page</button></div></nav>
+      <p class="note">{{ graph.evidencePolicy }}</p>
+    </section>
+  }
+  @if (data.reports.error; as error) { <section aria-label="Recent verification evidence unavailable"><app-registry-error-panel [error]="error" (retry)="facade.retry()" /></section> }
+  @if (data.reports.data; as reports) {
+    <section class="panel"><h2 id="recent-title">Recent matching verification evidence</h2><p class="note">Up to five recorded reports, including reruns. No report is elected as a compatibility result.</p>
+      @if (reports.items.length) { <div class="table-scroll" tabindex="0" role="region" aria-labelledby="recent-title"><table><caption class="visually-hidden">Recent matching reports with exact provider and CI identities</caption><thead><tr><th scope="col">Integration</th><th scope="col">Provider commit</th><th scope="col">Recorded status</th><th scope="col">CI execution</th></tr></thead><tbody>@for (run of reports.items; track run.id) { <tr><td><a [routerLink]="['/verifications', run.id]">{{ run.consumerApplicationId }} → {{ run.providerApplicationId }}</a><p class="identity">{{ run.id }}</p></td><td class="identity">{{ run.providerCommitSha }}</td><td><app-evidence-status [status]="run.status" /></td><td><span class="identity">{{ run.ciRunId }}</span><p>Attempt {{ run.ciAttempt }} · {{ run.ciCheckId }}</p></td></tr> }</tbody></table></div> }
+      @else { <h3>No matching verification reports</h3><p>No recorded reports match this selection. Zero reports is not a passing result.</p> }
+      <div class="actions"><a mat-button routerLink="/verifications" [queryParams]="historyQuery()">Open verification history</a></div>
+    </section>
+  }
+}

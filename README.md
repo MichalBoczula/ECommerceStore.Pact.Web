@@ -2,7 +2,7 @@
 
 Angular SPA for the ECommerceStore Pact contract registry. The Angular shell and anonymous API
 read boundary, registry explorer, verification details, stored comparisons and comparable issue
-history and stored compatibility matrices are implemented. Overview retains an intentional empty state. Issue history
+history, stored compatibility matrices and the registry overview/directed dependency graph are implemented. Issue history
 reads the registry only after an explicit before/after selection. No sample results are shown as live evidence.
 
 ## Run locally
@@ -45,7 +45,7 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 - NgRx root registration and development-only DevTools; feature stores/effects/facades arrive
   with their screens. The registry explorer and verification evidence have facades, feature state
   and cancellable effects.
-  Registry, verification, history and compatibility repository ports expose handwritten read models;
+  Registry, verification, history, compatibility and overview repository ports expose handwritten read models;
   generated Kiota DTOs stay in infrastructure.
 - Seven navigation destinations, responsive Material drawer, active-link semantics, skip link,
   document titles, and a not-found route. The explorer adds cursor pagination, bookmarkable filters,
@@ -61,8 +61,9 @@ to `main`, includes dependency review and secret scanning, and requires every ma
 
 The explorer extends the approved shell, cards, typography and Material control patterns.
 See [explorer routes and evidence scope](docs/explorer.md) and [verification history and details](docs/verifications.md).
-See [stored comparisons and comparable issue history](docs/history.md). Dashboard graphs, summary
-counts follow in WEB/08. See [stored compatibility matrices and pinned profiles](docs/compatibility.md).
+See [stored comparisons and comparable issue history](docs/history.md),
+[stored compatibility matrices and pinned profiles](docs/compatibility.md) and
+[overview scopes and the directed dependency graph](docs/overview.md).
 
 ## Related repositories
 
@@ -74,5 +75,6 @@ WEB/02 is merged in the API; WEB/03 pins its OpenAPI and adds the read boundary.
 the application, version, integration and publication explorer. WEB/05 adds verification history
 and diagnostic details. WEB/06 adds stored contract comparisons and comparable issue history.
 WEB/07 adds stored explicit-version compatibility matrices and pinned profile browsing.
-Next: WEB/08 adds the overview and directed dependency graph. Production Nginx/image delivery follows in WEB/10;
+WEB/08 adds global inventory, filtered report counts and a selectable, paged declaration graph.
+Next: WEB/09 adds real browser/API/MongoDB acceptance. Production Nginx/image delivery follows in WEB/10;
 CI remains responsible for publishing registry evidence.
