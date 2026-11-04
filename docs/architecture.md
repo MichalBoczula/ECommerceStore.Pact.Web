@@ -25,8 +25,8 @@ are part of the shell. Semantic colors follow the approved Figma concepts and ex
 ## API boundary (WEB/03)
 
 Browser → same-origin `/backend/api/...` → Angular development proxy or Nginx → Pact `/api/...`.
-The development proxy removes only `/backend`, preserving `/api`; production Nginx follows in
-WEB/10. One Pact API does not require a new business BFF. Reviewed upstream OpenAPI and pinned
+The development proxy removes only `/backend`, preserving `/api`; production Nginx implements
+the same path boundary with anonymous GETs in WEB/10. One Pact API does not require a new business BFF. Reviewed upstream OpenAPI and pinned
 Kiota 1.34.1 produce one committed GET-only client, loaded on the first repository read.
 Handwritten infrastructure repositories and mappers keep transport DTOs outside presentation and
 domain models. Domain-facing ports do not reference generated clients. Registry and verification
@@ -141,6 +141,13 @@ CI on `main`/PRs runs source checks, audit, lint/build, coverage, browser smoke,
 gitleaks. `quality-gate` fails when a mandatory dependency fails, is cancelled or unexpectedly skipped.
 The build job also verifies the snapshot hash, infrastructure import boundary and deterministic
 regeneration of the GET-only client. Generated files are excluded from lint/coverage; generated
-serialization is exercised by repository tests. WEB/10 will add build-once scanned-image publication.
-WEB/11 reuses the existing Terraform root/state and ACA environment. No image publishing, Terraform
-apply or cloud readiness is part of WEB/01-08.
+serialization is exercised by repository tests.
+
+WEB/10 adds a multi-stage production image: Angular build output and local fonts served by non-root
+Nginx on 8080, with deep-link fallback, cache policy, local probes and a server-side API origin.
+The GET-only proxy strips credentials/cookies and preserves API failures/original artifacts.
+CI builds one image, checks the real container, scans it and verifies archive transfer. The mandatory
+gate includes the container job. A green main push loads that archive in a separate publication job,
+verifies its source/image identity and pushes those same bytes with a manifest-digest receipt.
+See [image delivery and configuration](image-delivery.md). WEB/11 reuses the existing Terraform
+root/state and ACA environment. Publication does not establish deployment or cloud readiness.

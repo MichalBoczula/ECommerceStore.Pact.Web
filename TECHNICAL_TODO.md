@@ -13,8 +13,8 @@ The backend's PACT/09 source-CI pilot and the final hosted acceptance remain exp
 | WEB/06 | Contract comparisons and comparable issue history | Merged ([#5](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/5)); CI passed | 05 |
 | WEB/07 | Explicit-version compatibility matrices | Merged ([#6](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/6)); CI passed | 03, 04 |
 | WEB/08 | Overview and directed dependency graph | Merged ([#7](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/7)); CI passed | 04, 05, 07 |
-| WEB/09 | Registry-backed browser acceptance | Implemented; PR verification in progress | 04-08 |
-| WEB/10 | Tested/scanned immutable image publication | Planned | 09 |
+| WEB/09 | Registry-backed browser acceptance | Merged ([#8](https://github.com/MichalBoczula/ECommerceStore.Pact.Web/pull/8)); CI passed | 04-08 |
+| WEB/10 | Tested/scanned immutable image publication | Implemented; PR image verification in progress; publication requires a green main push | 09 |
 | WEB/11 | Pact Web in existing Terraform root/state | Planned | 10 |
 | WEB/12 | Hosted acceptance using real source-CI evidence | Planned | 11, backend PACT/09, operator deployment |
 

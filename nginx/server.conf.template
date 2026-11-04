@@ -1,0 +1,59 @@
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location = /health/live {
+        default_type text/plain;
+        add_header Cache-Control "no-store" always;
+        return 200 "live\n";
+    }
+    # Local SPA readiness is separate from API/database health and evidence status.
+    location = /health/ready {
+        if (!-f $document_root/index.html) { return 503; }
+        default_type text/plain;
+        add_header Cache-Control "no-store" always;
+        return 200 "ready\n";
+    }
+
+    location ^~ /backend/api/ {
+        if ($request_method != GET) { return 405; }
+        proxy_pass ${PACT_API_URL}/api/;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header Authorization "";
+        proxy_set_header Proxy-Authorization "";
+        proxy_set_header Cookie "";
+        proxy_hide_header Set-Cookie;
+        proxy_hide_header Cache-Control;
+        proxy_hide_header Expires;
+        add_header Cache-Control "no-store" always;
+        proxy_ssl_server_name on;
+        proxy_ssl_verify on;
+        proxy_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 60s;
+        proxy_redirect off;
+    }
+    location = /backend { return 404; }
+    location = /backend/api { return 404; }
+    location ^~ /backend/ { return 404; }
+    location = /api { return 404; }
+    location ^~ /api/ { return 404; }
+
+    location = /index.html {
+        add_header Cache-Control "no-store" always;
+    }
+    # Only Angular's content-hashed bundles get immutable caching.
+    location ~* "-[a-z0-9_-]{8,}\.(js|css)$" {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+    location ~* \.(js|css|map|woff2?|svg|ico|png|jpe?g|json|txt|html)$ {
+        try_files $uri =404;
+        add_header Cache-Control "no-cache";
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
